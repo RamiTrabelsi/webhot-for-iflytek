@@ -56,8 +56,8 @@
     <Compile Include="Model\Province.cs" />
     <Compile Include="Model\School.cs" />
     <Compile Include="Model\Village.cs" />
-    <Compile Include="UtilsHelper.cs" />
-    <Compile Include="XMLHelper.cs" />
+    <Compile Include="Helper\UtilsHelper.cs" />
+    <Compile Include="Helper\XMLHelper.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
