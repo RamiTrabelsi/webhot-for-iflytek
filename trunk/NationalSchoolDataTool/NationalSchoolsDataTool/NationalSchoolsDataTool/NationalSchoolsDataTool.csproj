@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcessDBUser.cs" />
+    <Compile Include="Model\EntityBase.cs" />
     <Compile Include="Model\Country.cs" />
     <Compile Include="Model\City.cs" />
     <Compile Include="Form1.cs">
