@@ -4,7 +4,8 @@ using System.Text;
 
 namespace NationalSchoolsDataTool
 {
-    class City
-    {
+    class City : EntityBase
+    {  
+        public List<Village> Villages { get; set; }
     }
 }

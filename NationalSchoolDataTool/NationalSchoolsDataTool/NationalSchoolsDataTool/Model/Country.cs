@@ -4,7 +4,8 @@ using System.Text;
 
 namespace NationalSchoolsDataTool
 {
-    class Country
-    {
+    class Country:EntityBase
+    {  
+        public List<Province> Provinces { get; set; }
     }
 }

@@ -4,7 +4,10 @@ using System.Text;
 
 namespace NationalSchoolsDataTool
 {
-    class School
+    class School : EntityBase
     {
+        public string SchoolProp1 { get; set; }
+
+        public string SchoolProp2 { get; set; }
     }
 }
