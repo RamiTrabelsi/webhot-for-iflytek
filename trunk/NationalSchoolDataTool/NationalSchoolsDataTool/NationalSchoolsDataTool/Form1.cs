@@ -14,5 +14,12 @@ namespace NationalSchoolsDataTool
         {
             InitializeComponent();
         }
+
+        private void btnSelectFolder_Click(object sender, EventArgs e)
+        {
+            //选择文件夹后,遍历文件夹下文件,读取文件数据
+
+
+        }
     }
 }
