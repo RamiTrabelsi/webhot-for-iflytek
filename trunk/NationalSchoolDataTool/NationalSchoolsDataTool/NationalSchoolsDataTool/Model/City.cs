@@ -4,8 +4,13 @@ using System.Text;
 
 namespace NationalSchoolsDataTool
 {
-    class City : EntityBase
-    {  
+    [Serializable]
+    class City
+    {
+        public int DistrictID { get; set; }
+
+        public string DistrictName { get; set; }
+
         public List<Village> Villages { get; set; }
     }
 }
