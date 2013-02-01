@@ -13,5 +13,10 @@ namespace NationalSchoolsDataTool
         public int ID { get; set; }
 
         public string Name { get; set; }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
