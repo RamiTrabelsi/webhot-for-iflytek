@@ -19,18 +19,21 @@ namespace NationalSchoolsDataTool
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
             //选择文件夹后,遍历文件夹下文件,生成文件路径
-            List<string> fileList = UtilsHelper.SelectFolder(UtilsHelper.ReadFolderPath());
+            List<string> fileList = UtilsHelper.SelectFolder(UtilsHelper.ReadFolderPath(folderBrowserDialog1));
+
+            if (!UtilsHelper.CheckFileList(fileList)) return;
 
             fileList.ForEach((filePath) =>
             {
-               EntityBase obj=XMLHelper.BuildObject(XMLHelper.LoadFileData(filePath));
+                Province obj = ObjBulider.CreateObject(XMLHelper.LoadFileData(filePath));
+
                 //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
                 if (XMLHelper.WriteObjToXML(obj))
                 {
-                    AcessDBUser.WirteObjectToAcess(obj);   
-                } 
+                    AcessDBUser.WirteObjectToAcess(obj);
+                }
 
-            });             
+            });
         }
     }
 }

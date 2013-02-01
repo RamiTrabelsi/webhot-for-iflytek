@@ -6,12 +6,8 @@ namespace NationalSchoolsDataTool
 {
     class AcessDBUser
     {
-        internal static object ReadXMLData(EntityBase obj)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static object WirteObjectToAcess(EntityBase obj)
+         
+        internal static object WirteObjectToAcess(Province obj)
         {
             throw new NotImplementedException();
         }

@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 namespace NationalSchoolsDataTool
 {
-    class Province : EntityBase
-    { 
+    [Serializable]
+    class Province
+    {
+        public int LocationID { get; set; }
+
+        public string Name { get; set; }
+
         public List<City> Citys { get; set; }
     }
 }
