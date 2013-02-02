@@ -20,6 +20,7 @@ namespace NationalSchoolsDataTool
         {
             //选择文件夹后,遍历文件夹下文件,生成文件路径
             string folderPath = UtilsHelper.ReadFolderPath(folderBrowserDialog1);
+            //string dbPath = UtilsHelper.GetDBPath();
 
             List<string> fileList = UtilsHelper.SelectFolder(folderPath);
 
@@ -28,17 +29,29 @@ namespace NationalSchoolsDataTool
             fileList.ForEach((filePath) =>
             {
                 try
-                { 
+                {
                     Province obj = ObjBulider.CreateProvinceObject(XMLHelper.LoadFileData(filePath));
-
+                    
                     //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
-                    if (XMLHelper.WriteObjToXML(obj, folderPath))
+                    if (checkBox1.Checked)
+                        XMLHelper.WriteObjToXML(obj, folderPath);
+                   
+                    if (!string.Equals(obj.LocationName, "安徽"))
                     {
-                        // AcessDBUser.WirteObjectToAcess(obj);
+                        //if (AcessDBUser.ConnectDB(dbPath, obj))
+                        //{
+
+                        //}
+                        //else
+                        //{
+                        //    //失败提示
+                        //}
                     }
+                    MessageBox.Show("完成!");
                 }
                 catch (Exception ex)
-                { 
+                {
+                    MessageBox.Show(ex.Message);
                     throw ex;
                 }
 

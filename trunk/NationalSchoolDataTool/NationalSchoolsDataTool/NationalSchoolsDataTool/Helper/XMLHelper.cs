@@ -31,15 +31,20 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         internal static bool WriteObjToXML<T>(T obj, string xmlfolderPath) where T : new()
         {
-            
             Province province = obj as Province;
 
             if (province == null) throw new Exception("类型错误!在: WriteObjToXML<T>(T obj)方法");
 
-          
+
             if (!Directory.Exists(xmlfolderPath)) throw new Exception("文件夹不存在! : WriteObjToXML<T>(T obj)方法");
-           
-            string xmlFilePath = Path.Combine(new DirectoryInfo(xmlfolderPath).Parent.FullName, string.Format("{0}.xml", province.LocationName));
+            string xmlDirectory = Path.Combine(xmlfolderPath, "XML文件");
+
+            if (!Directory.Exists(xmlDirectory))
+            {
+                Directory.CreateDirectory(xmlDirectory);
+            }
+
+            string xmlFilePath = Path.Combine(xmlDirectory, string.Format("{0}.xml", province.LocationName));
             try
             {
                 XmlSerializer xs = new XmlSerializer(typeof(T));

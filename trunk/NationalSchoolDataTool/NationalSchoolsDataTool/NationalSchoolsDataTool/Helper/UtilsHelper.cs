@@ -128,15 +128,17 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         internal static Province AnaliseStrData(string strData)
         {
+            strData = SelectExcessCondition(strData);
 
-            //将换行符号替换
-            strData = Regex.Replace(strData, "\\r\\n", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            #region 省份处理
 
             //省份信息处理
             string provinceName = GetProvinceName(strData);
             string provinceID = GetProvinceId(strData, provinceName);
 
             Province province = new Province() { LocationID = provinceID, LocationName = provinceName };
+
+            #endregion
 
             //分割内容
             string[] contentsSplit = GetContents(strData, @"\[三级目录\]");
@@ -148,10 +150,15 @@ namespace NationalSchoolsDataTool
             {
                 if (string.IsNullOrEmpty(cityInfo)) continue;
 
-                string cityName = cityInfo.Split('>')[1];
+                #region 市级处理
+
+                string cityName = cityInfo.Split('>')[1].PadRight(2, '0');   // 如 : 合肥 340100
                 string cityID = cityInfo.Split('"')[1];
                 City city = new City() { DistrictID = cityID, DistrictName = cityName, LocationID = provinceID };
                 province.Citys.Add(city);
+
+                #endregion
+
             }
 
             for (int i = 1; i < contentsSplit.Length; i++)     //三级目录的内容 :  广东;广州;荔湾区;<option value="440103">荔湾区   [学校列表]·廣州市荔灣區東沙小學·...
@@ -159,18 +166,26 @@ namespace NationalSchoolsDataTool
                 try
                 {
                     string[] strContents = GetContents(contentsSplit[i], @"\[学校列表\]"); //以学校列表分开
+                    if (strContents.Length < 2) continue;
 
                     string[] areaList = GetAreaInfo(strContents[0]);    //  strContents[0]:广东;广州;荔湾区;<option value="440103">荔湾区   
+                    if (areaList.Length < 2) continue;
+
+                    #region 区域处理
 
                     //区域级别处理
                     string areaName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
-                    string areaID = GetAreaID(strContents[0]);  // 440103
+                    string areaID = GetAreaID(strContents[0]);  // 如 : 东城区 110101
+
+                    #endregion
 
                     //市级信息处理,用于匹配
                     string cityNameByArea = areaList[1];
                     string cityIDByArea = GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
                     Village village = new Village() { VillageID = areaID, VillageName = areaName, DistrictID = cityIDByArea };
+
+                    #region 学校信息处理
 
                     //学校信息处理
                     string[] schoolNames = GetSchoolsInfo(strContents[1]);
@@ -181,7 +196,7 @@ namespace NationalSchoolsDataTool
                         {
                             if (string.IsNullOrEmpty(schoolName)) continue;
 
-                            string shcoolID = string.Format("{0}{1}", areaID, j++.ToString().PadLeft(3, '0'));   //001 
+                            string shcoolID = string.Format("{0}{1}", areaID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
 
                             School school = new School(shcoolID, areaID, cityIDByArea, schoolName, string.Empty, string.Empty);
 
@@ -192,6 +207,8 @@ namespace NationalSchoolsDataTool
                             throw ex;
                         }
                     }
+
+                    #endregion
 
                     City city = province.Citys.Find((c) => { return c.DistrictName == cityNameByArea && c.DistrictID == cityIDByArea; });
 
@@ -211,19 +228,46 @@ namespace NationalSchoolsDataTool
             {
                 try
                 {
-                    if (province.Citys[i].Villages == null || province.Citys[i].Villages.Count == 0)
+                    for (int j = 0; j < province.Citys[i].Villages.Count; j++)
+                    {
+                        if (province.Citys[i].Villages[j].Schools == null ||
+                          province.Citys[i].Villages[j].Schools.Count == 0)     //移除学校列表为空的
+                        {
+                            province.Citys.Remove(province.Citys[i]);
+                        }
+                    }
+
+                    if (province.Citys[i].Villages == null ||
+                        province.Citys[i].Villages.Count == 0)  //移除地区列表为空的
                     {
                         province.Citys.Remove(province.Citys[i]);
                     }
+
                 }
                 catch (System.Exception ex)
                 {
                     throw ex;
                 }
             }
-             
+
             return province;
 
+        }
+
+        /// <summary>
+        /// 筛选多余的信息
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        private static string SelectExcessCondition(string strData)
+        {
+            //将换行符,"人气最高","该地区暂时没有收录学校"和"其他"过滤
+            strData = Regex.Replace(strData, "\\r\\n", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            strData = Regex.Replace(strData, "人气最高", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            strData = Regex.Replace(strData, "该地区暂时没有收录学校", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            strData = Regex.Replace(strData, "其他", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+            return strData;
         }
 
 
@@ -239,7 +283,7 @@ namespace NationalSchoolsDataTool
         {
             string provincePattern = @"<\w+\s+\w+..\d+..>" + provinceName + @"<\/\w+>";  // <option value="44">广东</option>
             string provinceID = Regex.Match(strData, provincePattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value.Split('"')[1];  //44
-            return provinceID;
+            return provinceID.PadRight(4, '0'); // 如 : 北京 110000
         }
 
         /// <summary>
@@ -324,6 +368,28 @@ namespace NationalSchoolsDataTool
             string[] result = strs.ToArray();
 
             return result; //获取三级目录
+        }
+
+        /// <summary>
+        /// 获取数据库文件路径
+        /// </summary>
+        /// <returns></returns>
+        internal static string GetDBPath()
+        {
+            System.Windows.Forms.OpenFileDialog dialog = new System.Windows.Forms.OpenFileDialog();
+            dialog.CheckFileExists = true;
+            dialog.AddExtension = true;
+            dialog.Filter = "Acess数据库文件|*.mdb";
+            dialog.Title = "打开Acess数据库";
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                return dialog.FileName;
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("操作取消.");
+            }
+            return string.Empty;
         }
     }
 }
