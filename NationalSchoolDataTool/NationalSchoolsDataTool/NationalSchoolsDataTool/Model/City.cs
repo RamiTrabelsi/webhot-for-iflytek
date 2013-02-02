@@ -7,10 +7,23 @@ namespace NationalSchoolsDataTool
     [Serializable]
     class City
     {
-        public int DistrictID { get; set; }
+        public string DistrictID { get; set; }
 
         public string DistrictName { get; set; }
 
-        public List<Village> Villages { get; set; }
+        public string LocationID { get; set; }
+
+        public City()
+        {
+
+        }
+
+        public City(string id, string name, string locationID)
+            : this()
+        {
+            DistrictID = id;
+            DistrictName = name;
+            LocationID = locationID;
+        }
     }
 }

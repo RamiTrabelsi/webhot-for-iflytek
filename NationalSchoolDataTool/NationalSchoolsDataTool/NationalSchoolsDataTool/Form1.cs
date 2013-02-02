@@ -25,7 +25,7 @@ namespace NationalSchoolsDataTool
 
             fileList.ForEach((filePath) =>
             {
-                Province obj = ObjBulider.CreateObject(XMLHelper.LoadFileData(filePath));
+                Province obj = ObjBulider.CreateProvinceObject(XMLHelper.LoadFileData(filePath));
 
                 //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
                 if (XMLHelper.WriteObjToXML(obj))

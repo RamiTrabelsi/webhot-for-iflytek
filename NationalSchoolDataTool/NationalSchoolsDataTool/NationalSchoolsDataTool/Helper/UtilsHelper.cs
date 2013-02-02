@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace NationalSchoolsDataTool
 {
@@ -17,8 +18,6 @@ namespace NationalSchoolsDataTool
         {
             return diaglog != null && diaglog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? diaglog.SelectedPath : "";
         }
-
-
 
         /// <summary>
         /// 读取文件列表
@@ -36,11 +35,14 @@ namespace NationalSchoolsDataTool
             {
                 strlist.Add(info.FullName);
             }
+
+            strlist.Sort();
+
             return strlist;
         }
 
         /// <summary>
-        /// 坚持列表是否满足条件
+        /// 检测列表是否满足条件
         /// </summary>
         /// <param name="fileList"></param>
         /// <returns></returns>
@@ -115,6 +117,148 @@ namespace NationalSchoolsDataTool
             }
 
             return false;
+        }
+        /// <summary>
+        /// 解析文件内容
+        /// // -- 格式 : ##...##Test: Type6 广东##...##   广东;广州;荔湾区;option value="440103"荔湾区   [学校列表]·廣州市荔灣區東沙小學·...
+        /// // 44 - 省 , 01 - 市 , 03 - 区
+        /// </summary>
+        /// <param name="strData"></param>
+        internal static string AnaliseStrData(string strData)
+        {
+            //省份信息处理
+            string provinceName = GetProvinceName(strData);
+            string provinceID = GetProvinceId(strData, provinceName);
+
+            Province province = new Province(provinceID, provinceName);
+
+
+            string[] contentsLv3 = GetContents(strData, @"\[三级目录\]");
+
+            for (int i = 1; i < contentsLv3.Length; i++)     //循环从1开始,因为0是####...的内容
+            {
+                string[] strContents = GetContents(strData, @"[学校列表]"); //以学校列表分开
+
+                string[] areaList = GetAreaInfo(strContents[0]);
+
+                //区域级别处理
+                string areaName = areaList[areaList.Length - 1];
+                string areaID = GetAreaID(strContents[0]);
+
+                //市级信息处理
+                string cityName = areaList[1];
+                string cityID = GetCityID(strData, cityName);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
+
+                City city = new City(cityID, cityName, provinceID);
+
+                Village village = new Village(areaID, areaName, cityID);
+
+                //学校信息处理
+                string[] schoolNames = GetSchoolsInfo(strContents[1]);
+                int j = 1;
+                foreach (string schoolName in schoolNames)
+                {
+                    //001                   
+                    string shcoolID = string.Format("{0}{1}", areaID, j++.ToString().PadLeft(3, '0'));
+
+                    School school = new School(shcoolID, areaID, cityID, schoolName, string.Empty, string.Empty);
+                }
+
+
+
+            }
+
+            return string.Empty;
+        }
+
+
+        /// <summary>
+        /// 获取省份id  
+        /// 格式 :  option value="44"广东/option
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <param name="provinceName"></param>
+        /// <returns></returns>
+        private static string GetProvinceId(string strData, string provinceName)
+        {
+            string provincePattern = @"<\w+\s+\w+..\d+..>" + provinceName + @"<\/\w+>";  // <option value="44">广东</option>
+            string provinceID = Regex.Match(strData, provincePattern).Value.Split('"')[1];  //44
+            return provinceID;
+        }
+
+        /// <summary>
+        /// 获取省份名称
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns></returns>
+        private static string GetProvinceName(string strData)
+        {
+            string provincePattern = @"Test:\sType6\s.+$";  //Test: Type6 广东
+            string provinceName = Regex.Match(strData, provincePattern).Value.Split(' ')[2];  //广东
+            return provinceName;
+        }
+
+
+        /// <summary>
+        /// 获取市级ID
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <param name="cityName"></param>
+        /// <returns></returns>
+        private static string GetCityID(string strData, string cityName)
+        {
+            string cityPattern = @"<\w+\s+\w+..\d+..>" + cityName + @"<\/\w+>";  // <option value="4401">广州</option>
+            string provinceID = Regex.Match(strData, cityPattern).Value.Split('"')[1];  //4401
+            return provinceID;
+        }
+
+
+        /// <summary>
+        /// 处理地区信息
+        /// 格式 :  ·廣州市荔灣區東沙小學·...
+        /// </summary>
+        /// <param name="strContents"></param>
+        private static string[] GetSchoolsInfo(string strContents)
+        {
+            return strContents.Split('.');
+
+        }
+
+        /// <summary>
+        /// 处理学校信息
+        /// 格式: 广东;广州;荔湾区;option value="440103"荔湾区
+        /// </summary>
+        /// <param name="strContents"></param>
+        private static string[] GetAreaInfo(string strContents)
+        {
+            string realContents = strContents.Trim();    //生成: 广东;广州;荔湾区;<option value="440103">荔湾区
+
+            return realContents.Split(';');
+        }
+
+        /// <summary>
+        /// 处理地区id
+        /// </summary>
+        /// <param name="strContents"></param>
+        private static string GetAreaID(string strContents)
+        {
+            Match match = Regex.Match(strContents, @"<\w+\s+\w+..\d+..>");  //匹配<option value="440103">内容
+
+            return match.Value.Split('"')[1];   // 获取 440103
+
+        }
+
+        /// <summary>
+        /// 获取以指定格式分割的字符串数组,如果是三级目录内容以#开头
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <param name="partten"></param>
+        /// <returns></returns>
+        private static string[] GetContents(string strData, string partten)
+        {
+            if (string.Equals(partten, @"\[三级目录\]") && !strData.StartsWith("#")) return null;
+
+            return Regex.Split(strData, partten, RegexOptions.IgnoreCase); //获取三级目录
         }
     }
 }

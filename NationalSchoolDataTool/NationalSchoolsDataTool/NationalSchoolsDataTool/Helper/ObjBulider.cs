@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NationalSchoolsDataTool
 {
     class ObjBulider
-    { 
+    {
+         
         /// <summary>
-        /// 创建实体
+        /// 创建省的实体
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        internal static Province CreateObject(StringBuilder data)
+        internal static Province CreateProvinceObject(StringBuilder data)
         {
-            throw new NotImplementedException();
+            string strData = data.ToString();
+
+            UtilsHelper.AnaliseStrData(strData);
+             
+           
+
+            return province;
         }
+
+
+
+        
     }
 }
