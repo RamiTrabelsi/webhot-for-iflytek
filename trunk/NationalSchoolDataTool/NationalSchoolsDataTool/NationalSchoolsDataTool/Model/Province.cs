@@ -7,10 +7,20 @@ namespace NationalSchoolsDataTool
     [Serializable]
     class Province
     {
-        public int LocationID { get; set; }
+        public string LocationID { get; set; }
 
-        public string Name { get; set; }
+        public string LocationName { get; set; }
 
-        public List<City> Citys { get; set; }
+        public Province()
+        {
+
+        }
+
+        public Province(string id, string name)
+            : this()
+        {
+            LocationID = id;
+            LocationName = name;
+        }
     }
 }
