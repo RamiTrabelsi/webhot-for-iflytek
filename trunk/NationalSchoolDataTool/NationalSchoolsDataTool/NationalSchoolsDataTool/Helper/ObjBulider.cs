@@ -7,25 +7,16 @@ namespace NationalSchoolsDataTool
 {
     class ObjBulider
     {
-         
+
         /// <summary>
         /// 创建省的实体
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         internal static Province CreateProvinceObject(StringBuilder data)
-        {
-            string strData = data.ToString();
-
-            UtilsHelper.AnaliseStrData(strData);
-             
-           
-
-            return province;
+        { 
+            Province p = UtilsHelper.AnaliseStrData(data.ToString());
+            return p;
         }
-
-
-
-        
     }
 }

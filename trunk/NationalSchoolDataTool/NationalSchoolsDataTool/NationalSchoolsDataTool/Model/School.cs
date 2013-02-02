@@ -5,7 +5,7 @@ using System.Text;
 namespace NationalSchoolsDataTool
 {
     [Serializable]
-    class School
+    public class School
     {
         public string SchoolID { get; set; }
 

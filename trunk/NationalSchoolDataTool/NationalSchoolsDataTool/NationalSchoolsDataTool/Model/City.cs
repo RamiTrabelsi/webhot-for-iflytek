@@ -5,7 +5,7 @@ using System.Text;
 namespace NationalSchoolsDataTool
 {
     [Serializable]
-    class City
+    public class City
     {
         public string DistrictID { get; set; }
 
@@ -13,17 +13,27 @@ namespace NationalSchoolsDataTool
 
         public string LocationID { get; set; }
 
+        private List<Village> _villages =new List<Village>();
+
+        public List<Village> Villages
+        {
+            get { return _villages; }
+            set { _villages = value; }
+        }
+
+        
         public City()
         {
 
         }
 
-        public City(string id, string name, string locationID)
+        public City(string id, string name, string locationID, List<Village> villages)
             : this()
         {
             DistrictID = id;
             DistrictName = name;
             LocationID = locationID;
+            Villages = villages;
         }
     }
 }
