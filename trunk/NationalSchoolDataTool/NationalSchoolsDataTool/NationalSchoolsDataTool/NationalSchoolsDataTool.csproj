@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcessDBUser.cs" />
+    <Compile Include="Helper\DBHelper.cs" />
     <Compile Include="Model\City.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
