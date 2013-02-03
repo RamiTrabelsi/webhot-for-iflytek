@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using System.Threading;
 
 namespace NationalSchoolsDataTool
 {
@@ -14,54 +15,19 @@ namespace NationalSchoolsDataTool
         public Form1()
         {
             InitializeComponent();
+
+            MessageHelper.MsgEvent += new EventHandler(Instance_MsgEvent);
         }
 
+        
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
-            //选择文件夹后,遍历文件夹下文件,生成文件路径
-            string folderPath = UtilsHelper.ReadFolderPath(folderBrowserDialog1);
-            if (string.IsNullOrEmpty(folderPath)) return;
-
-            AcessDBUser.DBPath = UtilsHelper.GetDBPath();
-
-            if (string.IsNullOrEmpty(AcessDBUser.DBPath)) return;
-
-            List<string> fileList = UtilsHelper.SelectFolder(folderPath);
-
-            if (!UtilsHelper.CheckFileList(fileList)) return;
-
-            fileList.ForEach((filePath) =>
-            {
-                try
-                {
-                    Province obj = ObjBulider.CreateProvinceObject(XMLHelper.LoadFileData(filePath));
-
-                    //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
-                    if (checkBox1.Checked)
-                        XMLHelper.WriteObjToXML(obj, folderPath);
-
-                    //if (!string.Equals(obj.LocationName, "安徽"))
-                    //{
-
-                    if (AcessDBUser.InsertProvinceObjToDB(obj))
-                    {
-                        MessageBox.Show("完成!");
-                    }
-                    else
-                    {
-                        //失败提示
-                    }
-                    // }
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                    throw ex;
-                }
-
-            });
+            ProcessHelper.Instance.IniOpeart(folderBrowserDialog1, checkBox1.Checked, checkBox2.Checked);
         }
 
+        void Instance_MsgEvent(object sender, EventArgs e)
+        {
+
+        }
     }
 }
