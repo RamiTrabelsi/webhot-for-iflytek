@@ -11,7 +11,7 @@ namespace NationalSchoolsDataTool
 
         public string LocationName { get; set; }
 
-        public List<City> _citys = new List<City>();
+        private List<City> _citys = new List<City>();
 
         public List<City> Citys
         {
