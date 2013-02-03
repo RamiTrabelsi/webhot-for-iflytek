@@ -32,7 +32,7 @@ namespace NationalSchoolsDataTool
             OleDbCommand mycmd = null;
             CreatConn(DBPath, ref connection, ref mycmd);
 
-            List<string> cmdString = GetCommandString(obj);
+            List<string> cmdString = InsertSchoolCmdString(obj);
             try
             {
                 connection.Open();
@@ -60,7 +60,6 @@ namespace NationalSchoolsDataTool
                 if (connection != null && connection.State == ConnectionState.Open)
                     connection.Close();
             }
-
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         public static string QureyIDFromVillageDS(string villiageName, string districtID)
         {
-            villiageName = villiageName.Length > 1 ? villiageName.Substring(0, 1) : villiageName;
+            villiageName = villiageName.Length > 1 ? villiageName.Substring(0, villiageName.Length - 1) : villiageName;
             List<string> sList = new List<string>();
             try
             {
@@ -87,7 +86,7 @@ namespace NationalSchoolsDataTool
                 {
                     if (string.Equals(r["districtid"].ToString(), districtID))
                     {
-                        sList.Add(r["districtid"].ToString());
+                        sList.Add(r["villageid"].ToString());
                     }
                 }
                 return DBHelper.HandleQueryList(sList) ? sList[0] : string.Empty; ;
@@ -95,9 +94,9 @@ namespace NationalSchoolsDataTool
             catch (System.Exception ex)
             {
                 throw ex;
-            }         
+            }
         }
-               
+
         /// <summary>
         /// 查询区域信息,填充到数据集
         /// </summary>
@@ -176,11 +175,11 @@ namespace NationalSchoolsDataTool
         }
 
         /// <summary>
-        /// 获取插入命令字符串
+        /// 获取插入学校命令字符串
         /// </summary>
         /// <param name="province"></param>
         /// <returns></returns>
-        private static List<string> GetCommandString(Province province)
+        private static List<string> InsertSchoolCmdString(Province province)
         {
             List<string> cmdList = new List<string>();
             province.Citys.ForEach((c) =>
@@ -204,9 +203,37 @@ namespace NationalSchoolsDataTool
         /// <param name="villageID"></param>
         /// <param name="villageName"></param>
         /// <param name="cityIDByArea"></param>
+        /// <returns></returns>
         internal static void InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea)
         {
-            throw new NotImplementedException();
+            OleDbConnection connection = null;
+            OleDbCommand mycmd = null;
+            CreatConn(DBPath, ref connection, ref mycmd);
+
+            string cmdString = string.Format("INSERT INTO  [Village]([villageid],[villagename],[districtid]) VALUES('{0}','{1}','{2}');", villageID, villageName, cityIDByArea);
+            try
+            {
+                connection.Open();
+                mycmd.Transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                mycmd.CommandText = cmdString;
+                mycmd.ExecuteNonQuery();
+
+                mycmd.Transaction.Commit();
+
+            }
+            catch (Exception ex)
+            {
+                if (mycmd.Transaction != null)
+                    mycmd.Transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                //关闭连接 
+                if (connection != null && connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
         }
     }
 }

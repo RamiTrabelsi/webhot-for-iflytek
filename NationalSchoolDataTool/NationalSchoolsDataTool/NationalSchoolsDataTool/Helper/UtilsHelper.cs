@@ -184,9 +184,9 @@ namespace NationalSchoolsDataTool
                     string cityNameByArea = areaList[1];
                     string cityIDByArea = GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
-                    //根据城市的id和区域的名称去数据库中找区域的名称
-                    string vID = AcessDBUser.QureyIDFromVillageDS(villageID, cityIDByArea);
-                     
+                    //根据城市的id和区域的名称去数据库中找区域的名称 庐阳区
+                    string vID = AcessDBUser.QureyIDFromVillageDS(villageName, cityIDByArea);
+
                     if (!string.IsNullOrEmpty(vID))  //找到的话 赋值给areaID
                     {
                         villageID = vID;
@@ -194,7 +194,7 @@ namespace NationalSchoolsDataTool
                     else //找不到,说明数据库中没有此城市对应的区域
                     {
                         //那么,将更新数据库区域列表:将此条区域记录加入数据库中
-                        AcessDBUser.InsertVillageInfoToDB(villageID,villageName, cityIDByArea);
+                        AcessDBUser.InsertVillageInfoToDB(villageID, villageName, cityIDByArea);
                     }
 
                     Village village = new Village() { VillageID = villageID, VillageName = villageName, DistrictID = cityIDByArea };
