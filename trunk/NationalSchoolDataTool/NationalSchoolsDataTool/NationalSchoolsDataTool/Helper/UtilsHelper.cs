@@ -16,7 +16,7 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         internal static string ReadFolderPath(System.Windows.Forms.FolderBrowserDialog diaglog)
         {
-            return diaglog != null && diaglog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? diaglog.SelectedPath : "";
+            return diaglog != null && diaglog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? diaglog.SelectedPath : string.Empty;
         }
 
         /// <summary>
@@ -152,8 +152,8 @@ namespace NationalSchoolsDataTool
 
                 #region 市级处理
 
-                string cityName = cityInfo.Split('>')[1].PadRight(2, '0');   // 如 : 合肥 340100
-                string cityID = cityInfo.Split('"')[1];
+                string cityName = cityInfo.Split('>')[1];
+                string cityID = cityInfo.Split('"')[1].PadRight(6, '0'); // 如 : 合肥 340100
                 City city = new City() { DistrictID = cityID, DistrictName = cityName, LocationID = provinceID };
                 province.Citys.Add(city);
 
@@ -175,7 +175,7 @@ namespace NationalSchoolsDataTool
 
                     //区域级别处理
                     string areaName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
-                    string areaID = GetAreaID(strContents[0]);  // 如 : 东城区 110101
+                    string areaID = AcessDBUser.QureyFromVillages( "", ""); ;  // 如 : 东城区 110101
 
                     #endregion
 
@@ -283,7 +283,7 @@ namespace NationalSchoolsDataTool
         {
             string provincePattern = @"<\w+\s+\w+..\d+..>" + provinceName + @"<\/\w+>";  // <option value="44">广东</option>
             string provinceID = Regex.Match(strData, provincePattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value.Split('"')[1];  //44
-            return provinceID.PadRight(4, '0'); // 如 : 北京 110000
+            return provinceID.PadRight(6, '0'); // 如 : 北京 110000
         }
 
         /// <summary>
@@ -308,8 +308,8 @@ namespace NationalSchoolsDataTool
         private static string GetCityID(string strData, string cityName)
         {
             string cityPattern = @"<\w+\s+\w+..\d+..>" + cityName + @"<\/\w+>";  // <option value="4401">广州</option>
-            string provinceID = Regex.Match(strData, cityPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value.Split('"')[1];  //4401
-            return provinceID;
+            string cityID = Regex.Match(strData, cityPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value.Split('"')[1];  //4401
+            return cityID.PadRight(6, '0');
         }
 
 

@@ -15,7 +15,7 @@ namespace NationalSchoolsDataTool
 
         private List<School> _schools = new List<School>();
 
-        internal List<School> Schools
+        public List<School> Schools
         {
             get { return _schools; }
             set { _schools = value; }
