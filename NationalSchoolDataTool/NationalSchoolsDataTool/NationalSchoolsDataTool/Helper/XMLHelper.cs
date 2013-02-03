@@ -59,7 +59,5 @@ namespace NationalSchoolsDataTool
 
             return true;
         }
-
-
     }
 }

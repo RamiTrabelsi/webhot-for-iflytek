@@ -43,7 +43,7 @@ namespace NationalSchoolsDataTool
                     //if (!string.Equals(obj.LocationName, "安徽"))
                     //{
 
-                    if (AcessDBUser.InsertDataToDB(obj))
+                    if (AcessDBUser.InsertProvinceObjToDB(obj))
                     {
                         MessageBox.Show("完成!");
                     }

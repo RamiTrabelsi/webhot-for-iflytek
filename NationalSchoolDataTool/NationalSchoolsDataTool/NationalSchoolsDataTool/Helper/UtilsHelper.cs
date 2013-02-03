@@ -173,10 +173,10 @@ namespace NationalSchoolsDataTool
 
                     #region 区域处理
 
-                    
+
                     //区域级别处理
-                    string areaName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
-                    string areaID = GetAreaID(strContents[0]);  // 如 : 东城区 110101
+                    string villageName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
+                    string villageID = GetAreaID(strContents[0]);  //解析txt所得到的ID 如 : 东城区 110101
 
                     #endregion
 
@@ -185,16 +185,19 @@ namespace NationalSchoolsDataTool
                     string cityIDByArea = GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
                     //根据城市的id和区域的名称去数据库中找区域的名称
+                    string vID = AcessDBUser.QureyIDFromVillageDS(villageID, cityIDByArea);
+                     
+                    if (!string.IsNullOrEmpty(vID))  //找到的话 赋值给areaID
+                    {
+                        villageID = vID;
+                    }
+                    else //找不到,说明数据库中没有此城市对应的区域
+                    {
+                        //那么,将更新数据库区域列表:将此条区域记录加入数据库中
+                        AcessDBUser.InsertVillageInfoToDB(villageID,villageName, cityIDByArea);
+                    }
 
-                    //找到的话 赋值给areaID
-
-                    //找不到,说明数据库中没有此城市对应的区域
-
-                    //那么,将更新数据库区域列表:将此条区域记录加入数据库中
-
- 
-
-                    Village village = new Village() { VillageID = areaID, VillageName = areaName, DistrictID = cityIDByArea };
+                    Village village = new Village() { VillageID = villageID, VillageName = villageName, DistrictID = cityIDByArea };
 
                     #region 学校信息处理
 
@@ -207,9 +210,9 @@ namespace NationalSchoolsDataTool
                         {
                             if (string.IsNullOrEmpty(schoolName)) continue;
 
-                            string shcoolID = string.Format("{0}{1}", areaID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
+                            string shcoolID = string.Format("{0}{1}", villageID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
 
-                            School school = new School(shcoolID, areaID, cityIDByArea, schoolName, string.Empty, string.Empty);
+                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, string.Empty, string.Empty);
 
                             village.Schools.Add(school);
                         }

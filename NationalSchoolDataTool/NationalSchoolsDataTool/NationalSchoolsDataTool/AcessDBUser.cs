@@ -21,11 +21,11 @@ namespace NationalSchoolsDataTool
             set { _villageDS = value; }
         }
         /// <summary>
-        /// 连接数据库
+        /// 向数据库插入省份信息
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal static bool InsertDataToDB(Province obj)
+        internal static bool InsertProvinceObjToDB(Province obj)
         {
 
             OleDbConnection connection = null;
@@ -63,7 +63,13 @@ namespace NationalSchoolsDataTool
 
         }
 
-        public static string QureyFromVillages(string villiageName, string districtID)
+        /// <summary>
+        /// 从数据集中获取区域id
+        /// </summary>
+        /// <param name="villiageName"></param>
+        /// <param name="districtID"></param>
+        /// <returns></returns>
+        public static string QureyIDFromVillageDS(string villiageName, string districtID)
         {
             villiageName = villiageName.Length > 1 ? villiageName.Substring(0, 1) : villiageName;
             List<string> sList = new List<string>();
@@ -84,18 +90,14 @@ namespace NationalSchoolsDataTool
                         sList.Add(r["districtid"].ToString());
                     }
                 }
-                if (sList.Count != 1)
-                {
-                    throw new Exception("QureyFromVillages()方法的查询集合Count!=1,有多条数据匹配或没有查到对应的记录.");
-                }
+                return DBHelper.HandleQueryList(sList) ? sList[0] : string.Empty; ;
             }
             catch (System.Exception ex)
             {
                 throw ex;
-            }
-            return sList[0];
+            }         
         }
-
+               
         /// <summary>
         /// 查询区域信息,填充到数据集
         /// </summary>
@@ -166,7 +168,7 @@ namespace NationalSchoolsDataTool
         /// <param name="villiageName"></param>
         /// <param name="districtID"></param>
         /// <returns></returns>
-        internal static string GetVillageIDFromDS(string villiageName, string districtID)
+        private static string GetVillageIDFromDS(string villiageName, string districtID)
         {
             string queryStr = "SELECT [villageid] FROM [village] where [villagename] like '%{0}%' AND [districtid]={1}";
             string splicStr = string.Format(queryStr, villiageName.Substring(0, 2), districtID);
@@ -196,5 +198,15 @@ namespace NationalSchoolsDataTool
             return cmdList;
         }
 
+        /// <summary>
+        /// 插入新的区域记录
+        /// </summary>
+        /// <param name="villageID"></param>
+        /// <param name="villageName"></param>
+        /// <param name="cityIDByArea"></param>
+        internal static void InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
