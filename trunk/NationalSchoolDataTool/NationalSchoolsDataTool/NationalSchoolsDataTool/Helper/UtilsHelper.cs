@@ -132,7 +132,7 @@ namespace NationalSchoolsDataTool
 
             #region 省份处理
 
-            //省份信息处理
+            //解析txt所得到省份信息处理
             string provinceName = GetProvinceName(strData);
             string provinceID = GetProvinceId(strData, provinceName);
 
@@ -174,20 +174,20 @@ namespace NationalSchoolsDataTool
                     #region 区域处理
 
 
-                    //区域级别处理
+                    //解析txt所得到区域级别处理
                     string villageName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
                     string villageID = GetAreaID(strContents[0]);  //解析txt所得到的ID 如 : 东城区 110101
 
                     #endregion
 
-                    //市级信息处理,用于匹配
+                    //解析txt所得到市级信息处理,用于匹配
                     string cityNameByArea = areaList[1];
                     string cityIDByArea = GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
-                    //根据城市的id和区域的名称去数据库中找区域的名称 庐阳区
+                    //根据城市的id和区域的名称去数据库中找区域的名称
                     string vID = AcessDBUser.QureyIDFromVillageDS(villageName, cityIDByArea);
 
-                    if (!string.IsNullOrEmpty(vID))  //找到的话 赋值给areaID
+                    if (!string.IsNullOrEmpty(vID))  //找到的话,赋值给areaID
                     {
                         villageID = vID;
                     }
@@ -201,7 +201,7 @@ namespace NationalSchoolsDataTool
 
                     #region 学校信息处理
 
-                    //学校信息处理
+                    //解析txt所得到学校信息处理
                     string[] schoolNames = GetSchoolsInfo(strContents[1]);
                     int j = 1;
                     foreach (string schoolName in schoolNames)
