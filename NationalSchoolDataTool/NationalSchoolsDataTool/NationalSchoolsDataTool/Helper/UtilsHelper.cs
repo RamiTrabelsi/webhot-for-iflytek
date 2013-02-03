@@ -173,15 +173,26 @@ namespace NationalSchoolsDataTool
 
                     #region 区域处理
 
+                    
                     //区域级别处理
                     string areaName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
-                    string areaID = AcessDBUser.QureyFromVillages( "", ""); ;  // 如 : 东城区 110101
+                    string areaID = GetAreaID(strContents[0]);  // 如 : 东城区 110101
 
                     #endregion
 
                     //市级信息处理,用于匹配
                     string cityNameByArea = areaList[1];
                     string cityIDByArea = GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
+
+                    //根据城市的id和区域的名称去数据库中找区域的名称
+
+                    //找到的话 赋值给areaID
+
+                    //找不到,说明数据库中没有此城市对应的区域
+
+                    //那么,将更新数据库区域列表:将此条区域记录加入数据库中
+
+ 
 
                     Village village = new Village() { VillageID = areaID, VillageName = areaName, DistrictID = cityIDByArea };
 
