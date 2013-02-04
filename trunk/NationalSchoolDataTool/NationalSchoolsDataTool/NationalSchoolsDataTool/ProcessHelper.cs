@@ -113,12 +113,8 @@ namespace NationalSchoolsDataTool
                             }
                         }
 
-                        if (isCreateDBData && AcessDBUser.Instance.InsertProvinceObjToDB(obj))
-                        {
-                            MessageBox.Show("完成!");
-                        }
-                        else
-                        {
+                        if (!isCreateDBData || AcessDBUser.Instance.InsertProvinceObjToDB(obj))
+                        { 
                             MessageBox.Show("失败!");
                             //失败提示
                         }
@@ -134,7 +130,7 @@ namespace NationalSchoolsDataTool
                     MsgEventHandle(string.Format("操作失败 - {0}", ex.InnerException), MessageLV.High);
                     throw ex;
                 }
-
+                MessageBox.Show("完成!");
             });
         }
 
