@@ -30,11 +30,18 @@ namespace NationalSchoolsDataTool
         public static string DBPath { get; set; }
 
         private DataSet _villageDS = new DataSet();
+        private DataSet _schoolDS = new DataSet();
 
         public DataSet VillageDS
         {
             get { return _villageDS; }
             set { _villageDS = value; }
+        }
+
+        public DataSet SchoolDS
+        {
+            get { return _schoolDS; }
+            set { _schoolDS = value; }
         }
         /// <summary>
         /// 向数据库插入省份信息
@@ -69,9 +76,10 @@ namespace NationalSchoolsDataTool
             catch (Exception ex)
             {
                 ProcessHelper.MsgEventHandle(string.Format("InsertProvinceObjToDB(Province obj) 错误 : {0} ", ex.InnerException));
-
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
             finally
@@ -94,11 +102,8 @@ namespace NationalSchoolsDataTool
             List<string> sList = new List<string>();
             try
             {
+                FillDSFromDB(QueryAllTableInfo("village"), ref _villageDS, "Village");
 
-                if (VillageDS.Tables.Count == 0)
-                {
-                    FillVillageDSFromDB();
-                }
                 DataView dv = new DataView(VillageDS.Tables[0]);
                 dv.RowFilter = "[villagename] like '%" + villiageName + "%'";
                 DataTable dt = dv.ToTable();
@@ -109,11 +114,12 @@ namespace NationalSchoolsDataTool
                         sList.Add(r["villageid"].ToString());
                     }
                 }
-                return DBHelper.HandleQueryList(sList) ? sList[0] : string.Empty; ;
+                return DBHelper.HandleVilliageQueryList(sList) ? sList[0] : string.Empty; 
             }
             catch (System.Exception ex)
             {
                 ProcessHelper.MsgEventHandle(string.Format("QureyIDFromVillageDS(string villiageName, string districtID) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
         }
@@ -122,18 +128,19 @@ namespace NationalSchoolsDataTool
         /// 查询区域信息,填充到数据集
         /// </summary>
         /// <returns></returns>
-        private void FillVillageDSFromDB()
+        private void FillDSFromDB(string cmdText, ref DataSet ds, string tableName)
         {
+            if (ds.Tables.Count > 0) return;
 
             OleDbConnection connection = null;
             OleDbCommand mycmd = null;
             CreatConn(DBPath, ref connection, ref mycmd);
 
-            mycmd.CommandText = QueryAllVilliageInfo();
+            mycmd.CommandText = cmdText;
             try
             {
                 connection.Open();
-                GetDataSet(mycmd);
+                GetDataSet(mycmd, ref ds, tableName);
             }
             catch (Exception ex)
             {
@@ -141,6 +148,7 @@ namespace NationalSchoolsDataTool
 
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
             finally
@@ -153,15 +161,15 @@ namespace NationalSchoolsDataTool
         }
 
         /// <summary>
-        /// 查询字符串 :villiage表
+        /// 查询字符串 :[tableName]表
         /// </summary>
         /// <returns></returns>
-        private  string QueryAllVilliageInfo()
+        private string QueryAllTableInfo(string tableName)
         {
-            return "SELECT * FROM [village]";
+            return "SELECT * FROM [" + tableName + "]";
         }
 
-        private  void CreatConn(string dbFilePath, ref OleDbConnection connection, ref OleDbCommand mycmd)
+        private void CreatConn(string dbFilePath, ref OleDbConnection connection, ref OleDbCommand mycmd)
         {
             if (string.IsNullOrEmpty(dbFilePath)) return;
 
@@ -177,10 +185,10 @@ namespace NationalSchoolsDataTool
         /// 执行数据库查询
         /// </summary>
         /// <param name="cmd"></param>
-        private void GetDataSet(OleDbCommand cmd)
+        private void GetDataSet(OleDbCommand cmd, ref DataSet ds, string tableName)
         {
             OleDbDataAdapter dataAdapter = new OleDbDataAdapter(cmd);
-            dataAdapter.Fill(VillageDS, "Village");
+            dataAdapter.Fill(ds, tableName);           
             cmd.Dispose();
             dataAdapter.Dispose();
         }
@@ -249,7 +257,7 @@ namespace NationalSchoolsDataTool
             catch (Exception ex)
             {
                 ProcessHelper.MsgEventHandle(string.Format("InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
-
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
                 throw ex;
@@ -260,6 +268,45 @@ namespace NationalSchoolsDataTool
                 if (connection != null && connection.State == ConnectionState.Open)
                     connection.Close();
             }
+        }
+
+        internal bool QuerySchoolFromDBByCondition(string schoolName, string villageID)
+        {
+            schoolName = schoolName.Length > 2 ? schoolName.Substring(0, schoolName.Length - 2) : schoolName;
+            List<string> sList = new List<string>();
+            try
+            {
+
+                FillDSFromDB(QueryAllTableInfo("school"), ref _schoolDS, "school");
+
+                DataView dv = new DataView(_schoolDS.Tables[0]);
+                dv.RowFilter = "[schoolname] like '%" + schoolName.Replace('\'', ' ').Trim() + "%'";
+                DataTable dt = dv.ToTable();
+                foreach (DataRow r in dt.Rows)
+                {
+                    if (string.Equals(r["villageid"].ToString(), villageID))
+                    {
+                        sList.Add(r["villageid"].ToString());
+                    }
+                }
+                return DBHelper.HandleSchoolQueryList(sList);
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+                ProcessHelper.MsgEventHandle(string.Format("QureyIDFromVillageDS(string villiageName, string districtID) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                throw ex;
+            }
+        }
+
+        internal void ClearVillageDS()
+        {
+            VillageDS.Clear();
+        }
+
+        internal void ClearSchoolDS()
+        {
+            SchoolDS.Clear();
         }
     }
 }

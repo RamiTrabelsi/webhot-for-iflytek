@@ -94,40 +94,43 @@ namespace NationalSchoolsDataTool
                 try
                 {
                     Province obj = ObjBulider.CreateProvinceObject(XMLHelper.LoadFileData(filePath));
-
-                    ProcessHelper.MsgEventHandle(string.Format("创建 '{0}'省 实体成功.", obj.LocationName), MessageLV.Default);
-
-                    //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
-                    if (isCreateXML)
+                    if (obj.Citys.Count != 0)
                     {
-                        ProcessHelper.MsgEventHandle(string.Format("开始将 '{0}'省 数据实体写入到 '{1}\\XML文件'.", obj.LocationName, folderPath), MessageLV.Default);
+                        ProcessHelper.MsgEventHandle(string.Format("创建 '{0}'省 实体成功.", obj.LocationName), MessageLV.Default);
 
-                        if (XMLHelper.WriteObjToXML(obj, folderPath))
+                        //读取文件数据,生成xml文件,然后将xml文件映射到数据库中
+                        if (isCreateXML)
                         {
-                            ProcessHelper.MsgEventHandle("数据实体写入成功.", MessageLV.Default);
+                            ProcessHelper.MsgEventHandle(string.Format("开始将 '{0}'省 数据实体写入到 '{1}\\XML文件'.", obj.LocationName, folderPath), MessageLV.Default);
+
+                            if (XMLHelper.WriteObjToXML(obj, folderPath))
+                            {
+                                ProcessHelper.MsgEventHandle("数据实体写入成功.", MessageLV.Default);
+                            }
+                            else
+                            {
+                                ProcessHelper.MsgEventHandle("数据实体写入失败.", MessageLV.High);
+                            }
+                        }
+
+                        if (isCreateDBData && AcessDBUser.Instance.InsertProvinceObjToDB(obj))
+                        {
+                            MessageBox.Show("完成!");
                         }
                         else
                         {
-                            ProcessHelper.MsgEventHandle("数据实体写入失败.", MessageLV.High);
+                            MessageBox.Show("失败!");
+                            //失败提示
                         }
-                    }
-
-                    //if (!string.Equals(obj.LocationName, "安徽"))
-                    //{
-
-                    if (isCreateDBData && AcessDBUser.Instance.InsertProvinceObjToDB(obj))
-                    {
-                        MessageBox.Show("完成!");
                     }
                     else
                     {
-                        //失败提示
+                        MessageBox.Show(string.Format("{0} 的城市下没有相关数据.",obj.LocationName));
                     }
-                    // }
-
                 }
                 catch (Exception ex)
                 {
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                     MsgEventHandle(string.Format("操作失败 - {0}", ex.InnerException), MessageLV.High);
                     throw ex;
                 }
@@ -136,7 +139,7 @@ namespace NationalSchoolsDataTool
         }
 
 
-        public static void MsgEventHandle(string e ,MessageLV lv = MessageLV.Default)
+        public static void MsgEventHandle(string e, MessageLV lv = MessageLV.Default)
         {
 
             msg = e;

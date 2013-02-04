@@ -55,6 +55,7 @@ namespace NationalSchoolsDataTool
             catch (Exception ex)
             {
                 ProcessHelper.MsgEventHandle(string.Format("WriteObjToXML 错误 : {0} ", ex.InnerException));
+                System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
 
