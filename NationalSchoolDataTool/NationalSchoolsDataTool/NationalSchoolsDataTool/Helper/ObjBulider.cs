@@ -84,7 +84,7 @@ namespace NationalSchoolsDataTool
                     string cityIDByArea = UtilsHelper.GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
                     //根据城市的id和区域的名称去数据库中找区域的名称
-                    string vID = AcessDBUser.QureyIDFromVillageDS(villageName, cityIDByArea);
+                    string vID = AcessDBUser.Instance.QureyIDFromVillageDS(villageName, cityIDByArea);
 
                     if (!string.IsNullOrEmpty(vID))  //找到的话,赋值给areaID
                     {
@@ -93,7 +93,7 @@ namespace NationalSchoolsDataTool
                     else //找不到,说明数据库中没有此城市对应的区域
                     {
                         //那么,将更新数据库区域列表:将此条区域记录加入数据库中
-                        AcessDBUser.InsertVillageInfoToDB(villageID, villageName, cityIDByArea);
+                        AcessDBUser.Instance.InsertVillageInfoToDB(villageID, villageName, cityIDByArea);
                     }
 
                     Village village = new Village() { VillageID = villageID, VillageName = villageName, DistrictID = cityIDByArea };
@@ -111,13 +111,13 @@ namespace NationalSchoolsDataTool
 
                             string shcoolID = string.Format("{0}{1}", villageID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
 
-                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, string.Empty, string.Empty);
+                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, UtilsHelper.GetSchoolType(strData), string.Empty);
 
                             village.Schools.Add(school);
                         }
                         catch (System.Exception ex)
                         {
-                            MessageHelper.ShowMessage(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                            ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
                         }
                     }
 
@@ -132,7 +132,7 @@ namespace NationalSchoolsDataTool
                 }
                 catch (System.Exception ex)
                 {
-                    MessageHelper.ShowMessage(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                    ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
 
                 }
             }
@@ -160,7 +160,8 @@ namespace NationalSchoolsDataTool
                 }
                 catch (System.Exception ex)
                 {
-                    MessageHelper.ShowMessage(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                    ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
+                    throw ex;
                 }
             }
 

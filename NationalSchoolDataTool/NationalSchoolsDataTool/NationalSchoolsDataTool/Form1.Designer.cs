@@ -32,9 +32,9 @@
             this.btnSelectFolder = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.lboxInfo = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -59,18 +59,6 @@
             this.checkBox1.Text = "保存xml文件";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
-            // lboxInfo
-            // 
-            this.lboxInfo.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lboxInfo.FormattingEnabled = true;
-            this.lboxInfo.ItemHeight = 12;
-            this.lboxInfo.Location = new System.Drawing.Point(5, 207);
-            this.lboxInfo.Margin = new System.Windows.Forms.Padding(5, 3, 5, 5);
-            this.lboxInfo.Name = "lboxInfo";
-            this.lboxInfo.ScrollAlwaysVisible = true;
-            this.lboxInfo.Size = new System.Drawing.Size(709, 256);
-            this.lboxInfo.TabIndex = 3;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -80,6 +68,7 @@
             this.label1.Size = new System.Drawing.Size(84, 14);
             this.label1.TabIndex = 4;
             this.label1.Text = "输出信息 : ";
+            this.label1.Visible = false;
             // 
             // checkBox2
             // 
@@ -94,14 +83,24 @@
             this.checkBox2.Text = "生成到数据库";
             this.checkBox2.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(93, 172);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(41, 12);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "label2";
+            this.label2.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(719, 468);
+            this.ClientSize = new System.Drawing.Size(719, 213);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.lboxInfo);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.btnSelectFolder);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -120,9 +119,9 @@
         private System.Windows.Forms.Button btnSelectFolder;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.ListBox lboxInfo;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.Label label2;
     }
 }
 

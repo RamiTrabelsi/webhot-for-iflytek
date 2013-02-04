@@ -9,13 +9,29 @@ namespace NationalSchoolsDataTool
 {
     class AcessDBUser
     {
+        private static AcessDBUser _instance;
+
+        internal static AcessDBUser Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new AcessDBUser();
+                }
+                return _instance;
+            }
+            set { _instance = value; }
+        }
+
+
         private const string ACESSDBPWD = "iflytek_BBT@2012!";
 
         public static string DBPath { get; set; }
 
-        private static DataSet _villageDS = new DataSet();
+        private DataSet _villageDS = new DataSet();
 
-        public static DataSet VillageDS
+        public DataSet VillageDS
         {
             get { return _villageDS; }
             set { _villageDS = value; }
@@ -25,7 +41,7 @@ namespace NationalSchoolsDataTool
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal static bool InsertProvinceObjToDB(Province obj)
+        public bool InsertProvinceObjToDB(Province obj)
         {
 
             OleDbConnection connection = null;
@@ -40,6 +56,8 @@ namespace NationalSchoolsDataTool
 
                 for (int i = 0; i < cmdString.Count; i++)
                 {
+                    ProcessHelper.MsgEventHandle(string.Format(",共有数据: {0} 条,当前插入:第 {1} 条,插入数据:{2} ", cmdString.Count, i, cmdString[i]));
+
                     mycmd.CommandText = cmdString[i];
                     mycmd.ExecuteNonQuery();
                 }
@@ -50,9 +68,11 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
+                ProcessHelper.MsgEventHandle(string.Format("InsertProvinceObjToDB(Province obj) 错误 : {0} ", ex.InnerException));
+
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
-                return false;
+                throw ex;
             }
             finally
             {
@@ -68,7 +88,7 @@ namespace NationalSchoolsDataTool
         /// <param name="villiageName"></param>
         /// <param name="districtID"></param>
         /// <returns></returns>
-        public static string QureyIDFromVillageDS(string villiageName, string districtID)
+        public string QureyIDFromVillageDS(string villiageName, string districtID)
         {
             villiageName = villiageName.Length > 1 ? villiageName.Substring(0, villiageName.Length - 1) : villiageName;
             List<string> sList = new List<string>();
@@ -93,6 +113,7 @@ namespace NationalSchoolsDataTool
             }
             catch (System.Exception ex)
             {
+                ProcessHelper.MsgEventHandle(string.Format("QureyIDFromVillageDS(string villiageName, string districtID) 错误 : {0} ", ex.InnerException), MessageLV.High);
                 throw ex;
             }
         }
@@ -101,7 +122,7 @@ namespace NationalSchoolsDataTool
         /// 查询区域信息,填充到数据集
         /// </summary>
         /// <returns></returns>
-        private static void FillVillageDSFromDB()
+        private void FillVillageDSFromDB()
         {
 
             OleDbConnection connection = null;
@@ -116,8 +137,11 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
+                ProcessHelper.MsgEventHandle(string.Format("FillVillageDSFromDB() 错误 : {0} ", ex.InnerException), MessageLV.High);
+
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
+                throw ex;
             }
             finally
             {
@@ -132,12 +156,12 @@ namespace NationalSchoolsDataTool
         /// 查询字符串 :villiage表
         /// </summary>
         /// <returns></returns>
-        private static string QueryAllVilliageInfo()
+        private  string QueryAllVilliageInfo()
         {
             return "SELECT * FROM [village]";
         }
 
-        private static void CreatConn(string dbFilePath, ref OleDbConnection connection, ref OleDbCommand mycmd)
+        private  void CreatConn(string dbFilePath, ref OleDbConnection connection, ref OleDbCommand mycmd)
         {
             if (string.IsNullOrEmpty(dbFilePath)) return;
 
@@ -153,7 +177,7 @@ namespace NationalSchoolsDataTool
         /// 执行数据库查询
         /// </summary>
         /// <param name="cmd"></param>
-        private static void GetDataSet(OleDbCommand cmd)
+        private void GetDataSet(OleDbCommand cmd)
         {
             OleDbDataAdapter dataAdapter = new OleDbDataAdapter(cmd);
             dataAdapter.Fill(VillageDS, "Village");
@@ -204,7 +228,7 @@ namespace NationalSchoolsDataTool
         /// <param name="villageName"></param>
         /// <param name="cityIDByArea"></param>
         /// <returns></returns>
-        internal static void InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea)
+        internal void InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea)
         {
             OleDbConnection connection = null;
             OleDbCommand mycmd = null;
@@ -224,6 +248,8 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
+                ProcessHelper.MsgEventHandle(string.Format("InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
+
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
                 throw ex;

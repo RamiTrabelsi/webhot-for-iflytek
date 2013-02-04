@@ -88,7 +88,7 @@ namespace NationalSchoolsDataTool
             }
             catch (IOException ex)
             {
-                MessageHelper.ShowMessage(string.Format("GetFileContent 发生错误: {0}", ex.InnerException), MessageLV.High);
+                ProcessHelper.MsgEventHandle(string.Format("GetFileContent 发生错误: {0}", ex.InnerException));
             }
 
             return sb;
@@ -122,7 +122,7 @@ namespace NationalSchoolsDataTool
             return false;
         }
 
-     
+
         /// <summary>
         /// 筛选多余的信息
         /// </summary>
@@ -260,6 +260,34 @@ namespace NationalSchoolsDataTool
                 System.Windows.Forms.MessageBox.Show("操作取消.");
             }
             return string.Empty;
+        }
+
+        internal static string GetSchoolType(string strData)
+        {
+            string schoolPattern = @"Type\d";  //Test: Type6 
+            string schoolName = Regex.Match(strData, schoolPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value;  //广东
+            string typeNum = Regex.Match(schoolName, @"\d").Value;
+            string schoolType = string.Empty;
+            switch (typeNum)
+            {
+                case "1":
+                case "2":
+                case "3":
+                case "7":
+                default:
+                    schoolType = "大学";
+                    break;
+                case "4":
+                case "5":
+                case "8":
+                    schoolType = "中学";
+                    break;
+                case "6":
+                    schoolType = "小学";
+                    break;
+            }
+
+            return schoolType;
         }
     }
 }

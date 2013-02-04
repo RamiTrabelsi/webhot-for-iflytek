@@ -18,6 +18,8 @@ namespace NationalSchoolsDataTool
             }
             else if (sList.Count > 1)
             {
+                ProcessHelper.MsgEventHandle("HandleQueryList 错误 : QureyFromVillages()方法的查询集合Count!=1,有多条数据匹配或没有查到对应的记录. ");
+                
                 throw new Exception("QureyFromVillages()方法的查询集合Count!=1,有多条数据匹配或没有查到对应的记录.");
             }
             return true;
