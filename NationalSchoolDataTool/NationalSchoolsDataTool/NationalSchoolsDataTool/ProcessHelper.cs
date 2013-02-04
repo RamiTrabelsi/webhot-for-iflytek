@@ -61,24 +61,24 @@ namespace NationalSchoolsDataTool
 
             //MessageHelper.ShowMessage("开始数据读写操作.", MessageLV.Default);
 
-            //StartProcess(isCreateXML, isGenerateDBData, folderPath, fileList);
+            StartProcess(isCreateXML, isGenerateDBData, folderPath, fileList);
 
-            StartProcessHandler handler = new StartProcessHandler(StartProcess);
-            IAsyncResult result = handler.BeginInvoke(isCreateXML, isGenerateDBData, folderPath, fileList, new AsyncCallback(CallBack), "AsycState:OK");
+            //StartProcessHandler handler = new StartProcessHandler(StartProcess);
+            //IAsyncResult result = handler.BeginInvoke(isCreateXML, isGenerateDBData, folderPath, fileList, new AsyncCallback(CallBack), "AsycState:OK");
 
-            while (!result.IsCompleted)
-            {
-                MesContainer.Text = msg;
-                Thread.Sleep(1000);
-                continue;
-            }
+            //while (!result.IsCompleted)
+            //{
+            //    //MesContainer.Text = msg;
+            //    Thread.Sleep(1000);
+            //    continue;
+            //}
         }
 
-        static void CallBack(IAsyncResult result)
-        {
-            StartProcessHandler handler = (StartProcessHandler)((System.Runtime.Remoting.Messaging.AsyncResult)result).AsyncDelegate;
-            handler.EndInvoke(result);
-        }
+        //static void CallBack(IAsyncResult result)
+        //{
+        //    StartProcessHandler handler = (StartProcessHandler)((System.Runtime.Remoting.Messaging.AsyncResult)result).AsyncDelegate;
+        //    handler.EndInvoke(result);
+        //}
 
         /// <summary>
         /// 开始数据读写操作
