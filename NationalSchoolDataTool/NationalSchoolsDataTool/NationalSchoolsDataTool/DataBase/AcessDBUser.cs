@@ -220,7 +220,7 @@ namespace NationalSchoolsDataTool
                 {
                     v.Schools.ForEach((s) =>
                     {
-                        cmdList.Add(string.Format("INSERT INTO [School]([schoolid],[villageid],[districtid],[schoolname]) VALUES('{0}','{1}','{2}','{3}');",
+                        cmdList.Add(string.Format("INSERT INTO [School]([schoolid],[villageid],[districtid],[schoolname],[schoolprop]) VALUES('{0}','{1}','{2}','{3}',{4});",
                                                                      s.SchoolID, s.VilliageID, s.DistrictID, s.SchoolName.Replace('\'', ' ')));
                     });
                 });
