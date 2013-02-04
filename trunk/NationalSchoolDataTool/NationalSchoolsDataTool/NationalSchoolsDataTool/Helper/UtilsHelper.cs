@@ -89,6 +89,8 @@ namespace NationalSchoolsDataTool
             catch (IOException ex)
             {
                 ProcessHelper.MsgEventHandle(string.Format("GetFileContent 发生错误: {0}", ex.InnerException));
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+                throw ex;
             }
 
             return sb;

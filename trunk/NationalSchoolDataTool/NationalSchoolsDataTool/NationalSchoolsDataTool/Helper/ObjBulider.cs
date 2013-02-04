@@ -13,7 +13,7 @@ namespace NationalSchoolsDataTool
         /// <param name="data"></param>
         /// <returns></returns>
         internal static Province CreateProvinceObject(StringBuilder data)
-        { 
+        {
             Province p = AnaliseStrData(data.ToString());
             return p;
         }
@@ -23,24 +23,26 @@ namespace NationalSchoolsDataTool
         /// -- 格式 : ##...##Test: Type6 广东##...##  ...  [三级目录]广东;广州;荔湾区;option value="440103"荔湾区   [学校列表]·廣州市荔灣區東沙小學·...
         /// 44 - 省 , 01 - 市 , 03 - 区
         /// </summary>
-        /// <param name="strData"></param>
+        /// <param name="strProvinceData"></param>
         /// <returns></returns>
-        internal static Province AnaliseStrData(string strData)
+        internal static Province AnaliseStrData(string strProvinceData)
         {
-            strData = UtilsHelper.SelectExcessCondition(strData);
+            strProvinceData = UtilsHelper.SelectExcessCondition(strProvinceData);
+
+            string schoolType = UtilsHelper.GetSchoolType(strProvinceData);
 
             #region 省份处理
 
             //解析txt所得到省份信息处理
-            string provinceName = UtilsHelper.GetProvinceName(strData);
-            string provinceID = UtilsHelper.GetProvinceId(strData, provinceName);
+            string provinceName = UtilsHelper.GetProvinceName(strProvinceData);
+            string provinceID = UtilsHelper.GetProvinceId(strProvinceData, provinceName);
 
             Province province = new Province() { LocationID = provinceID, LocationName = provinceName };
 
             #endregion
 
             //分割内容
-            string[] contentsSplit = UtilsHelper.GetContents(strData, @"\[三级目录\]");
+            string[] contentsSplit = UtilsHelper.GetContents(strProvinceData, @"\[三级目录\]");
 
             string cityOptions = UtilsHelper.GetContents(contentsSplit[0], @"\[二级目录\]")[1];    //二级目录内容: <option value="1301">石家庄</option><option value="1302">唐山</option>...
             string[] cityInfos = Regex.Split(cityOptions, @"</option>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -81,7 +83,7 @@ namespace NationalSchoolsDataTool
 
                     //解析txt所得到市级信息处理,用于匹配
                     string cityNameByArea = areaList[1];
-                    string cityIDByArea = UtilsHelper.GetCityID(strData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
+                    string cityIDByArea = UtilsHelper.GetCityID(strProvinceData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
                     //根据城市的id和区域的名称去数据库中找区域的名称
                     string vID = AcessDBUser.Instance.QureyIDFromVillageDS(villageName, cityIDByArea);
@@ -111,16 +113,24 @@ namespace NationalSchoolsDataTool
 
                             string shcoolID = string.Format("{0}{1}", villageID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
 
-                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, UtilsHelper.GetSchoolType(strData), string.Empty);
+                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, schoolType, string.Empty);
 
-                            village.Schools.Add(school);
+                            // //去数据库中取出学校名称和区域id一致的字段, 如果没有匹配,则插入
+                            if (AcessDBUser.Instance.QuerySchoolFromDBByCondition(schoolName, villageID))
+                            {
+                                village.Schools.Add(school);
+                            }
+
                         }
                         catch (System.Exception ex)
                         {
+                            System.Windows.Forms.MessageBox.Show(ex.Message);
                             ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
+                            throw ex;
                         }
                     }
-
+                    AcessDBUser.Instance.ClearSchoolDS();
+                    AcessDBUser.Instance.ClearVillageDS();
                     #endregion
 
                     City city = province.Citys.Find((c) => { return c.DistrictName == cityNameByArea && c.DistrictID == cityIDByArea; });
@@ -133,38 +143,36 @@ namespace NationalSchoolsDataTool
                 catch (System.Exception ex)
                 {
                     ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
-
-                }
-            }
-
-            //去除空项
-            for (int i = 0; i < province.Citys.Count; i++)
-            {
-                try
-                {
-                    for (int j = 0; j < province.Citys[i].Villages.Count; j++)
-                    {
-                        if (province.Citys[i].Villages[j].Schools == null ||
-                          province.Citys[i].Villages[j].Schools.Count == 0)     //移除学校列表为空的
-                        {
-                            province.Citys.Remove(province.Citys[i]);
-                        }
-                    }
-
-                    if (province.Citys[i].Villages == null ||
-                        province.Citys[i].Villages.Count == 0)  //移除地区列表为空的
-                    {
-                        province.Citys.Remove(province.Citys[i]);
-                    }
-
-                }
-                catch (System.Exception ex)
-                {
-                    ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
                     throw ex;
                 }
             }
 
+            try
+            {
+                for (int i = province.Citys.Count - 1; i >= 0; i--)
+                {
+                    for (int j = province.Citys[i].Villages.Count - 1; j >= 0; j--)
+                    {
+                        if (province.Citys[i].Villages[j].Schools.Count == 0)     //移除学校列表为空的
+                        {
+                            province.Citys[i].Villages.Remove(province.Citys[i].Villages[j]);
+
+                        }
+                    }
+
+                    if (province.Citys[i].Villages.Count == 0)  //移除地区列表为空的
+                    {
+                        province.Citys.Remove(province.Citys[i]);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+                ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
+                throw ex;
+            }
             return province;
 
         }

@@ -40,7 +40,7 @@
             // btnSelectFolder
             // 
             this.btnSelectFolder.Font = new System.Drawing.Font("宋体", 10F);
-            this.btnSelectFolder.Location = new System.Drawing.Point(275, 84);
+            this.btnSelectFolder.Location = new System.Drawing.Point(124, 103);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(171, 59);
             this.btnSelectFolder.TabIndex = 0;
@@ -52,7 +52,7 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Font = new System.Drawing.Font("宋体", 10F);
-            this.checkBox1.Location = new System.Drawing.Point(401, 31);
+            this.checkBox1.Location = new System.Drawing.Point(250, 58);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(103, 18);
             this.checkBox1.TabIndex = 1;
@@ -63,7 +63,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 10F);
-            this.label1.Location = new System.Drawing.Point(2, 172);
+            this.label1.Location = new System.Drawing.Point(8, 184);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(84, 14);
             this.label1.TabIndex = 4;
@@ -76,7 +76,7 @@
             this.checkBox2.Checked = true;
             this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox2.Font = new System.Drawing.Font("宋体", 10F);
-            this.checkBox2.Location = new System.Drawing.Point(214, 31);
+            this.checkBox2.Location = new System.Drawing.Point(63, 50);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(110, 18);
             this.checkBox2.TabIndex = 5;
@@ -86,7 +86,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(93, 172);
+            this.label2.Location = new System.Drawing.Point(99, 184);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 12);
             this.label2.TabIndex = 7;
@@ -97,7 +97,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(719, 213);
+            this.ClientSize = new System.Drawing.Size(416, 213);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.label1);
