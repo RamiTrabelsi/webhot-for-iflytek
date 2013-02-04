@@ -16,18 +16,14 @@ namespace NationalSchoolsDataTool
         {
             InitializeComponent();
 
-            MessageHelper.MsgEvent += new EventHandler(Instance_MsgEvent);
+            ProcessHelper.MesContainer = this.label2; 
         }
 
-        
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
             ProcessHelper.Instance.IniOpeart(folderBrowserDialog1, checkBox1.Checked, checkBox2.Checked);
         }
-
-        void Instance_MsgEvent(object sender, EventArgs e)
-        {
-
-        }
+         
+        
     }
 }

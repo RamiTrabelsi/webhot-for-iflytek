@@ -47,8 +47,6 @@
   <ItemGroup>
     <Compile Include="DataBaseHelper\AcessDBUser.cs" />
     <Compile Include="Helper\DBHelper.cs" />
-    <Compile Include="Message\MessageEventArgs.cs" />
-    <Compile Include="Message\MessageHelper.cs" />
     <Compile Include="Model\City.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
