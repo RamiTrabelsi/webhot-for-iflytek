@@ -93,19 +93,21 @@ namespace NationalSchoolsDataTool
         /// <summary>
         /// 从数据集中获取区域id
         /// </summary>
-        /// <param name="villiageName"></param>
+        /// <param name="villageName"></param>
         /// <param name="districtID"></param>
+        /// <param name="provinceName"></param>
         /// <returns></returns>
-        public string QureyIDFromVillageDS(string villiageName, string districtID)
+        public string QureyIDFromVillageDS(string villageName, string districtID, bool isMunicipality)
         {
-            villiageName = villiageName.Length > 1 ? villiageName.Substring(0, villiageName.Length - 1) : villiageName;
+            villageName = villageName.Length > 1 ? villageName.Substring(0, villageName.Length - 1).Trim() : villageName;
+
             List<string> sList = new List<string>();
             try
             {
                 FillDSFromDB(QueryAllTableInfo("village"), ref _villageDS, "Village");
 
                 DataView dv = new DataView(VillageDS.Tables[0]);
-                dv.RowFilter = "[villagename] like '%" + villiageName + "%'";
+                dv.RowFilter = "[villagename] like '" + villageName.Trim() + "%'";
                 DataTable dt = dv.ToTable();
                 foreach (DataRow r in dt.Rows)
                 {
@@ -114,7 +116,7 @@ namespace NationalSchoolsDataTool
                         sList.Add(r["villageid"].ToString());
                     }
                 }
-                return DBHelper.HandleVilliageQueryList(sList) ? sList[0] : string.Empty; 
+                return DBHelper.HandleVilliageQueryList(sList) ? sList[0] : string.Empty;
             }
             catch (System.Exception ex)
             {
@@ -130,7 +132,7 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         private void FillDSFromDB(string cmdText, ref DataSet ds, string tableName)
         {
-            if (ds.Tables.Count > 0) return;
+            if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 1) return;
 
             OleDbConnection connection = null;
             OleDbCommand mycmd = null;
@@ -188,7 +190,7 @@ namespace NationalSchoolsDataTool
         private void GetDataSet(OleDbCommand cmd, ref DataSet ds, string tableName)
         {
             OleDbDataAdapter dataAdapter = new OleDbDataAdapter(cmd);
-            dataAdapter.Fill(ds, tableName);           
+            dataAdapter.Fill(ds, tableName);
             cmd.Dispose();
             dataAdapter.Dispose();
         }
@@ -220,8 +222,8 @@ namespace NationalSchoolsDataTool
                 {
                     v.Schools.ForEach((s) =>
                     {
-                        cmdList.Add(string.Format("INSERT INTO [School]([schoolid],[villageid],[districtid],[schoolname],[schoolprop]) VALUES('{0}','{1}','{2}','{3}',{4});",
-                                                                     s.SchoolID, s.VilliageID, s.DistrictID, s.SchoolName.Replace('\'', ' '),s.SchoolProp1));
+                        cmdList.Add(string.Format("INSERT INTO [School]([schoolid],[villageid],[districtid],[schoolname],[schoolprop]) VALUES('{0}','{1}','{2}','{3}','{4}');",
+                                                                     s.SchoolID, s.VilliageID, s.DistrictID, s.SchoolName.Replace('\'', ' '), s.SchoolProp1));
                     });
                 });
             });

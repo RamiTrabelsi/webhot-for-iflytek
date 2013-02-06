@@ -27,9 +27,9 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         internal static Province AnaliseStrData(string strProvinceData)
         {
-            strProvinceData = UtilsHelper.SelectExcessCondition(strProvinceData);
+            strProvinceData = UtilsHelper.SelectExcessCondition(strProvinceData);   //处理多余信息
 
-            string schoolType = UtilsHelper.GetSchoolType(strProvinceData);
+            string schoolType = UtilsHelper.GetSchoolType(strProvinceData); //获取学校类型:大,中,小学
 
             #region 省份处理
 
@@ -38,28 +38,40 @@ namespace NationalSchoolsDataTool
             string provinceID = UtilsHelper.GetProvinceId(strProvinceData, provinceName);
 
             Province province = new Province() { LocationID = provinceID, LocationName = provinceName };
-
             #endregion
 
             //分割内容
             string[] contentsSplit = UtilsHelper.GetContents(strProvinceData, @"\[三级目录\]");
 
-            string cityOptions = UtilsHelper.GetContents(contentsSplit[0], @"\[二级目录\]")[1];    //二级目录内容: <option value="1301">石家庄</option><option value="1302">唐山</option>...
-            string[] cityInfos = Regex.Split(cityOptions, @"</option>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            bool isMuitCity = false;
 
-            foreach (string cityInfo in cityInfos)
+            if (UtilsHelper.IsMuitCity(provinceName))   //直辖市处理
             {
-                if (string.IsNullOrEmpty(cityInfo)) continue;
+                isMuitCity = true;
 
-                #region 市级处理
+                City city1 = new City() { DistrictID = string.Format("{0}0100", provinceID.Substring(0, 2)), DistrictName = "市辖区", LocationID = provinceID };
+                City city2 = new City() { DistrictID = string.Format("{0}0200", provinceID.Substring(0, 2)), DistrictName = "县", LocationID = provinceID };
 
-                string cityName = cityInfo.Split('>')[1];
-                string cityID = cityInfo.Split('"')[1].PadRight(6, '0'); // 如 : 合肥 340100
-                City city = new City() { DistrictID = cityID, DistrictName = cityName, LocationID = provinceID };
-                province.Citys.Add(city);
+                province.Citys.Add(city1);
+                province.Citys.Add(city2);
+            }
+            else  //普通省市处理
+            {
+                string cityOptions = UtilsHelper.GetContents(contentsSplit[0], @"\[二级目录\]")[1];
+                string[] cityInfos = UtilsHelper.HandleCityInfos(cityOptions);   //二级目录内容: <option value="1301">石家庄</option><option value="1302">唐山</option>...
 
-                #endregion
+                foreach (string cityInfo in cityInfos)
+                {
+                    if (string.IsNullOrEmpty(cityInfo)) continue;
 
+                    #region 市级处理
+
+                    string cityName = cityInfo.Split('>')[1];   //处理 <option value="1301">石家庄</option>
+                    string cityID = cityInfo.Split('"')[1].PadRight(6, '0'); // 如 : 合肥 340100
+                    City city = new City() { DistrictID = cityID, DistrictName = cityName, LocationID = provinceID };
+                    province.Citys.Add(city);
+                    #endregion
+                }
             }
 
             for (int i = 1; i < contentsSplit.Length; i++)     //三级目录的内容 :  广东;广州;荔湾区;<option value="440103">荔湾区   [学校列表]·廣州市荔灣區東沙小學·...
@@ -76,7 +88,7 @@ namespace NationalSchoolsDataTool
 
 
                     //解析txt所得到区域级别处理
-                    string villageName = areaList[areaList.Length - 1].Split('>')[1];    // 荔湾区  
+                    string villageName = areaList[areaList.Length - 1].Split('>')[1].Replace(" ", string.Empty);    // 荔湾区  
                     string villageID = UtilsHelper.GetAreaID(strContents[0]);  //解析txt所得到的ID 如 : 东城区 110101
 
                     #endregion
@@ -86,7 +98,24 @@ namespace NationalSchoolsDataTool
                     string cityIDByArea = UtilsHelper.GetCityID(strProvinceData, cityNameByArea);   //取出来三级目录中的市名称,再匹配二级目录的id就是市级id
 
                     //根据城市的id和区域的名称去数据库中找区域的名称
-                    string vID = AcessDBUser.Instance.QureyIDFromVillageDS(villageName, cityIDByArea);
+
+                    if (isMuitCity)
+                    {
+                        //根据原始数据提取区域信息,然后判断是否为直辖市,再根据原始数据决定二级目录
+                        if (villageName.Trim().EndsWith("区"))  //东城区
+                        {
+                            cityNameByArea = "市辖区";
+                            cityIDByArea = string.Format("{0}0100", cityIDByArea.Substring(0, 2));
+                        }
+                        else if (villageName.Trim().EndsWith("县")) //密云县
+                        {
+                            cityNameByArea = "县";
+                            cityIDByArea = string.Format("{0}0200", cityIDByArea.Substring(0, 2));
+                        }
+                    }
+
+                    //从数据库中获取id,找不到则插入
+                    string vID = AcessDBUser.Instance.QureyIDFromVillageDS(villageName, cityIDByArea, isMuitCity);
 
                     if (!string.IsNullOrEmpty(vID))  //找到的话,赋值给areaID
                     {
@@ -96,6 +125,8 @@ namespace NationalSchoolsDataTool
                     {
                         //那么,将更新数据库区域列表:将此条区域记录加入数据库中
                         AcessDBUser.Instance.InsertVillageInfoToDB(villageID, villageName, cityIDByArea);
+
+                        AcessDBUser.Instance.ClearVillageDS();
                     }
 
                     Village village = new Village() { VillageID = villageID, VillageName = villageName, DistrictID = cityIDByArea };
@@ -109,18 +140,16 @@ namespace NationalSchoolsDataTool
                     {
                         try
                         {
-                            if (string.IsNullOrEmpty(schoolName)) continue;
+                            string dealSchoolName = UtilsHelper.HandleSpecialSymbol(schoolName).Trim();
+
+                            if (string.IsNullOrEmpty(dealSchoolName)) continue;
 
                             string shcoolID = string.Format("{0}{1}", villageID, j++.ToString().PadLeft(3, '0'));   // 如 : 安徽蚌埠美佛儿国际学校 340305012
 
-                            School school = new School(shcoolID, villageID, cityIDByArea, schoolName, schoolType, string.Empty);
+                            School school = new School(shcoolID, villageID, cityIDByArea, dealSchoolName, schoolType, string.Empty);
 
-                            // //去数据库中取出学校名称和区域id一致的字段, 如果没有匹配,则插入
-                            if (AcessDBUser.Instance.QuerySchoolFromDBByCondition(schoolName, villageID))
-                            {
-                                village.Schools.Add(school);
-                            }
-
+                            //直接插入插入,因为判断的话太耗时了
+                            village.Schools.Add(school);
                         }
                         catch (System.Exception ex)
                         {
@@ -129,8 +158,7 @@ namespace NationalSchoolsDataTool
                             throw ex;
                         }
                     }
-                    AcessDBUser.Instance.ClearSchoolDS();
-                    AcessDBUser.Instance.ClearVillageDS();
+
                     #endregion
 
                     City city = province.Citys.Find((c) => { return c.DistrictName == cityNameByArea && c.DistrictID == cityIDByArea; });
@@ -150,11 +178,12 @@ namespace NationalSchoolsDataTool
 
             try
             {
+                //移除多余信息
                 for (int i = province.Citys.Count - 1; i >= 0; i--)
                 {
                     for (int j = province.Citys[i].Villages.Count - 1; j >= 0; j--)
                     {
-                        if (province.Citys[i].Villages[j].Schools.Count == 0)     //移除学校列表为空的
+                        if (province.Citys[i].Villages[j].Schools.Count == 0 || (!isMuitCity && province.Citys[i].Villages[j].VillageName == "市辖区"))     //移除学校列表为空的
                         {
                             province.Citys[i].Villages.Remove(province.Citys[i].Villages[j]);
 
@@ -173,6 +202,8 @@ namespace NationalSchoolsDataTool
                 ProcessHelper.MsgEventHandle(string.Format("AnaliseStrData(string strData) 错误 : {0} ", ex.InnerException));
                 throw ex;
             }
+            //AcessDBUser.Instance.ClearSchoolDS();
+
             return province;
 
         }
