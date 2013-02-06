@@ -113,15 +113,19 @@ namespace NationalSchoolsDataTool
                             }
                         }
 
-                        if (!isCreateDBData || AcessDBUser.Instance.InsertProvinceObjToDB(obj))
-                        { 
-                            MessageBox.Show("失败!");
-                            //失败提示
+                        if (isCreateDBData)
+                        {
+                            if (!AcessDBUser.Instance.InsertProvinceObjToDB(obj))
+                            {
+                                MessageBox.Show("失败!");
+                                //失败提示
+                            }
                         }
+
                     }
                     else
                     {
-                        MessageBox.Show(string.Format("{0} 的城市下没有相关数据.",obj.LocationName));
+                        MessageBox.Show(string.Format("{0} 的城市下没有相关数据.", obj.LocationName));
                     }
                 }
                 catch (Exception ex)
@@ -129,9 +133,9 @@ namespace NationalSchoolsDataTool
                     System.Windows.Forms.MessageBox.Show(ex.Message);
                     MsgEventHandle(string.Format("操作失败 - {0}", ex.InnerException), MessageLV.High);
                     throw ex;
-                }
-                MessageBox.Show("完成!");
+                }              
             });
+            MessageBox.Show("完成!");
         }
 
 

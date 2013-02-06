@@ -264,6 +264,11 @@ namespace NationalSchoolsDataTool
             return string.Empty;
         }
 
+        /// <summary>
+        /// 获取学校类型
+        /// </summary>
+        /// <param name="strData"></param>
+        /// <returns>大学,小学,中学</returns>
         internal static string GetSchoolType(string strData)
         {
             string schoolPattern = @"Type\d";  //Test: Type6 
@@ -291,5 +296,41 @@ namespace NationalSchoolsDataTool
 
             return schoolType;
         }
+
+        /// <summary>
+        /// 处理特殊符号
+        /// </summary>
+        /// <param name="schoolNames"></param>
+        /// <returns></returns>
+        internal static string HandleSpecialSymbol(string schoolNames)
+        {
+            return LanguageTextHelper.GetChCharsAndNumsWithoutPunctuation(schoolNames).Trim();
+        }
+
+        /// <summary>
+        ///// 获取学校
+        /// </summary>
+        /// <param name="cityOptions"></param>
+        /// <returns></returns>
+        internal static string[] HandleCityInfos(string cityOptions)
+        {
+            return Regex.Split(cityOptions, @"</option>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        }
+
+        /// <summary>
+        /// 是否是直辖市
+        /// </summary>
+        /// <returns></returns>
+        internal static bool IsMuitCity(string provinceName)
+        {
+            provinceName = provinceName.Trim();
+
+            return string.Equals(provinceName, "北京") ||
+                            string.Equals(provinceName, "上海") ||
+                            string.Equals(provinceName, "天津") ||
+                            string.Equals(provinceName, "重庆");
+        }
+
+
     }
 }

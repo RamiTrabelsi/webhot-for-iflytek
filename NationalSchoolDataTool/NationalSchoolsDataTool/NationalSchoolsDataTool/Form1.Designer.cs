@@ -35,6 +35,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnSelectFolder
@@ -93,11 +94,21 @@
             this.label2.Text = "label2";
             this.label2.Visible = false;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 222);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(443, 12);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "注:对区域信息采用的是判断数据库是否存在然后插入,对学校信息不判断,直接追加";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 213);
+            this.ClientSize = new System.Drawing.Size(460, 271);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.label1);
@@ -122,6 +133,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }
 
