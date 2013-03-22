@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnSelectFolder = new System.Windows.Forms.Button();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
@@ -41,7 +40,7 @@
             // btnSelectFolder
             // 
             this.btnSelectFolder.Font = new System.Drawing.Font("宋体", 10F);
-            this.btnSelectFolder.Location = new System.Drawing.Point(124, 103);
+            this.btnSelectFolder.Location = new System.Drawing.Point(145, 103);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(171, 59);
             this.btnSelectFolder.TabIndex = 0;
@@ -53,7 +52,7 @@
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.Font = new System.Drawing.Font("宋体", 10F);
-            this.checkBox1.Location = new System.Drawing.Point(250, 58);
+            this.checkBox1.Location = new System.Drawing.Point(273, 50);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(103, 18);
             this.checkBox1.TabIndex = 1;
@@ -77,7 +76,7 @@
             this.checkBox2.Checked = true;
             this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox2.Font = new System.Drawing.Font("宋体", 10F);
-            this.checkBox2.Location = new System.Drawing.Point(63, 50);
+            this.checkBox2.Location = new System.Drawing.Point(84, 50);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(110, 18);
             this.checkBox2.TabIndex = 5;
@@ -92,7 +91,6 @@
             this.label2.Size = new System.Drawing.Size(41, 12);
             this.label2.TabIndex = 7;
             this.label2.Text = "label2";
-            this.label2.Visible = false;
             // 
             // label3
             // 
@@ -128,7 +126,6 @@
         #endregion
 
         private System.Windows.Forms.Button btnSelectFolder;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBox2;

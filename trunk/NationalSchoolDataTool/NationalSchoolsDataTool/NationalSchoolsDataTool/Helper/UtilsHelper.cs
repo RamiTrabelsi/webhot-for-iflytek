@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace NationalSchoolsDataTool
 {
@@ -14,9 +15,13 @@ namespace NationalSchoolsDataTool
         /// </summary>
         /// <param name="diaglog"></param>
         /// <returns></returns>
-        internal static string ReadFolderPath(System.Windows.Forms.FolderBrowserDialog diaglog)
+        internal static string ReadFolderPath()
         {
-            return diaglog != null && diaglog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? diaglog.SelectedPath : string.Empty;
+            FolderBrowserDialog diaglog = new FolderBrowserDialog() { SelectedPath= Environment.GetFolderPath(Environment.SpecialFolder.Desktop)};
+
+            return diaglog != null && diaglog.ShowDialog() == DialogResult.OK ? 
+                   diaglog.SelectedPath : 
+                   string.Empty;
         }
 
         /// <summary>
@@ -42,16 +47,6 @@ namespace NationalSchoolsDataTool
             strlist.Sort();
 
             return strlist;
-        }
-
-        /// <summary>
-        /// 检测列表是否满足条件
-        /// </summary>
-        /// <param name="fileList"></param>
-        /// <returns></returns>
-        internal static bool CheckFileList(List<string> fileList)
-        {
-            return fileList != null && fileList.Count > 0;
         }
 
         /// <summary>
@@ -126,13 +121,12 @@ namespace NationalSchoolsDataTool
 
 
         /// <summary>
-        /// 筛选多余的信息
+        /// 筛选多余的信息(将换行符,"人气最高","该地区暂时没有收录学校"和"其他"过滤)
         /// </summary>
         /// <param name="strData"></param>
         /// <returns></returns>
         public static string SelectExcessCondition(string strData)
-        {
-            //将换行符,"人气最高","该地区暂时没有收录学校"和"其他"过滤
+        { 
             strData = Regex.Replace(strData, "\\r\\n", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
             strData = Regex.Replace(strData, "人气最高", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
             strData = Regex.Replace(strData, "该地区暂时没有收录学校", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -167,6 +161,27 @@ namespace NationalSchoolsDataTool
             string provincePattern = @"Test:\sType\d\s(.[^#]+)";  //Test: Type6 广东
             string provinceName = Regex.Match(strData, provincePattern, RegexOptions.IgnoreCase | RegexOptions.Multiline).Value.Split(' ')[2];  //广东
             return provinceName;
+        }
+
+        /// <summary>
+        /// 根据原始数据提取区域信息,然后判断是否为直辖市,再根据txt原始数据决定二级目录
+        /// </summary>
+        /// <param name="villageName"></param>
+        /// <param name="cityNameByArea"></param>
+        /// <param name="cityIDByArea"></param>
+        internal static void DealMuitCityArea(string villageName, ref string cityNameByArea, ref string cityIDByArea)
+        {
+
+            if (villageName.Trim().EndsWith("区"))  //东城区
+            {
+                cityNameByArea = "市辖区";
+                cityIDByArea = string.Format("{0}0100", cityIDByArea.Substring(0, 2));
+            }
+            else if (villageName.Trim().EndsWith("县")) //密云县
+            {
+                cityNameByArea = "县";
+                cityIDByArea = string.Format("{0}0200", cityIDByArea.Substring(0, 2));
+            }
         }
 
 

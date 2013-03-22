@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\MessageInfo.cs" />
+    <Compile Include="Model\Country.cs" />
     <Compile Include="DataBase\AcessDBUser.cs" />
     <Compile Include="Helper\DBHelper.cs" />
     <Compile Include="Helper\LanguageTextHelper.cs" />
@@ -64,6 +66,7 @@
     <Compile Include="Model\Village.cs" />
     <Compile Include="Helper\UtilsHelper.cs" />
     <Compile Include="Helper\XMLHelper.cs" />
+    <Compile Include="Helper\TipInfos.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
