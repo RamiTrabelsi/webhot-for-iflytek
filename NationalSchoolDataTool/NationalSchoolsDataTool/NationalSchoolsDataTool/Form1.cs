@@ -14,15 +14,25 @@ namespace NationalSchoolsDataTool
     {
         public Form1()
         {
-            InitializeComponent();
-
-            ProcessHelper.MesContainer = this.label2; 
+            InitializeComponent();             
         }
 
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
-            ProcessHelper.Instance.IniOpeart(folderBrowserDialog1, checkBox1.Checked, checkBox2.Checked);
+            bool isCreateXML = checkBox1.Checked;
+            bool isCreatDB = checkBox2.Checked;
+
+            ProcessHelper.Instance.ShowMessaged += new MsgEventHandle(Instance_ShowMessaged);
+
+            ProcessHelper.Instance.IniOpeart(isCreateXML, isCreatDB);
         }
+
+        void Instance_ShowMessaged(string e, string messLV, params object[] args)
+        {
+           
+        }
+
+        
          
         
     }

@@ -8,8 +8,22 @@ using System.IO;
 
 namespace NationalSchoolsDataTool
 {
-    class XMLHelper
+    class XMLHelper:MessageInfo
     {
+        private static XMLHelper _instance;
+
+        internal static XMLHelper Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new XMLHelper();
+                }
+                return _instance;
+            }
+        }
+
         /// <summary>
         /// 遍历文件列表,返回文件流文档
         /// </summary>
@@ -27,17 +41,21 @@ namespace NationalSchoolsDataTool
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj">对象</param>
-        /// <param name="xmlfolderPath">文件夹路径</param>
-        /// <returns></returns>
-        internal static bool WriteObjToXML<T>(T obj, string xmlfolderPath) where T : new()
+        /// <param name="xmlfolderPath">文件夹路径</param> 
+        internal  void  WriteObjToXML<T>(T obj, string xmlfolderPath, bool isCreatXML) where T : new()
         {
+            if (!isCreatXML) return ;
+
             Province province = obj as Province;
 
-            if (province == null) throw new Exception("类型错误!在: WriteObjToXML<T>(T obj)方法");
+            MsgEventHandle(string.Format(TipInfos.Begin_XMLWrite, province.LocationName, xmlfolderPath), MessageLV.Default);
+             
+            if (province == null) throw new Exception(TipInfos.WrongType_XMLWrite);
 
 
-            if (!Directory.Exists(xmlfolderPath)) throw new Exception("文件夹不存在! : WriteObjToXML<T>(T obj)方法");
-            string xmlDirectory = Path.Combine(xmlfolderPath, "XML文件");
+            if (!Directory.Exists(xmlfolderPath)) throw new Exception(TipInfos.FoldeNotFound_XMLWrite);
+
+            string xmlDirectory = Path.Combine(xmlfolderPath, "XMLFolder");
 
             if (!Directory.Exists(xmlDirectory))
             {
@@ -54,12 +72,10 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("WriteObjToXML 错误 : {0} ", ex.InnerException));
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
 
-            return true;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Data.Common;
 
 namespace NationalSchoolsDataTool
 {
-    class AcessDBUser
+    class AcessDBUser : MessageInfo
     {
         private static AcessDBUser _instance;
 
@@ -27,7 +27,20 @@ namespace NationalSchoolsDataTool
 
         private const string ACESSDBPWD = "iflytek_BBT@2012!";
 
-        public static string DBPath { get; set; }
+        private static string _DBPath = string.Empty;
+
+        public static string DBPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_DBPath))
+                {
+                    _DBPath = UtilsHelper.GetDBPath();
+                }
+                return AcessDBUser._DBPath;
+            }
+        }
+
 
         private DataSet _villageDS = new DataSet();
         private DataSet _schoolDS = new DataSet();
@@ -48,8 +61,9 @@ namespace NationalSchoolsDataTool
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public bool InsertProvinceObjToDB(Province obj)
+        public void InsertProvinceObjToDB(Province obj, bool isCreateDBDates)
         {
+            if (!isCreateDBDates) return;
 
             OleDbConnection connection = null;
             OleDbCommand mycmd = null;
@@ -71,7 +85,6 @@ namespace NationalSchoolsDataTool
 
                 mycmd.Transaction.Commit();
 
-                return true;
             }
             catch (Exception ex)
             {
@@ -99,7 +112,20 @@ namespace NationalSchoolsDataTool
         /// <returns></returns>
         public string QureyIDFromVillageDS(string villageName, string districtID, bool isMunicipality)
         {
-            villageName = villageName.Length > 1 ? villageName.Substring(0, villageName.Length - 1).Trim() : villageName;
+            villageName = villageName.Trim();
+            if (villageName.Length > 1)
+            {
+                if (villageName.Length == 2)
+                {
+                    villageName = string.Format("{0} {1}", villageName[0], villageName[1]);
+                }
+                //else
+                //{
+                //    villageName = villageName.Substring(0, villageName.Length - 1).Trim();
+                //}
+            }
+
+            //villageName = villageName.Length > 1 ? villageName.Substring(0, villageName.Length - 1).Trim() : villageName;
 
             List<string> sList = new List<string>();
             try
@@ -309,6 +335,84 @@ namespace NationalSchoolsDataTool
         internal void ClearSchoolDS()
         {
             SchoolDS.Clear();
+        }
+
+        /// <summary>
+        /// 删除区域冗余数据
+        /// </summary>
+        internal void DeleteInvideVillageInfos(string cid)
+        {
+            OleDbConnection connection = null;
+            OleDbCommand mycmd = null;
+            CreatConn(DBPath, ref connection, ref mycmd);
+
+            string cmdString = string.Format("DELETE FROM  [Village] WHERE [villagename] = '市辖区' and [districtid] = '{0}'", cid);
+            try
+            {
+                connection.Open();
+                mycmd.Transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                mycmd.CommandText = cmdString;
+                mycmd.ExecuteNonQuery();
+
+                mycmd.Transaction.Commit();
+
+            }
+            catch (Exception ex)
+            {
+                ProcessHelper.MsgEventHandle(string.Format("InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+                if (mycmd.Transaction != null)
+                    mycmd.Transaction.Rollback();
+            }
+            finally
+            {
+                //关闭连接 
+                if (connection != null && connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// 获取这个地区最大的schoolId
+        /// </summary>
+        /// <param name="villageID"></param>
+        /// <returns></returns>
+        internal int ReadMaxShcoolID(string villageID)
+        {
+
+            OleDbConnection connection = null;
+            OleDbCommand mycmd = null;
+            CreatConn(DBPath, ref connection, ref mycmd);
+
+            string cmdString = string.Format("SELECT [SCHOOLID] FROM [SCHOOL] WHERE [VILLAGEID] = '{0}'", villageID);
+            try
+            {
+                int count = 0;
+                connection.Open();
+                mycmd.CommandText = cmdString;
+                var reader = mycmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    ++count;
+                }
+
+                return count;
+            }
+            catch (Exception ex)
+            {
+                ProcessHelper.MsgEventHandle(string.Format("ReadMaxShcoolID(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+                if (mycmd.Transaction != null)
+                    mycmd.Transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                //关闭连接 
+                if (connection != null && connection.State == ConnectionState.Open)
+                    connection.Close();
+            }
         }
     }
 }
