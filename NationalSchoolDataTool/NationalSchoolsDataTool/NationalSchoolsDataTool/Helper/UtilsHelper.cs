@@ -8,8 +8,7 @@ using System.Windows.Forms;
 namespace NationalSchoolsDataTool
 {
     class UtilsHelper
-    {
-
+    { 
         /// <summary>
         /// 读取文件路径
         /// </summary>
@@ -83,7 +82,6 @@ namespace NationalSchoolsDataTool
             }
             catch (IOException ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("GetFileContent 发生错误: {0}", ex.InnerException));
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
@@ -345,7 +343,6 @@ namespace NationalSchoolsDataTool
                             string.Equals(provinceName, "天津") ||
                             string.Equals(provinceName, "重庆");
         }
-
 
     }
 }

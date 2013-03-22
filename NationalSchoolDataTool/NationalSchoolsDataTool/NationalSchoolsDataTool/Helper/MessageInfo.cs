@@ -14,7 +14,7 @@ namespace NationalSchoolsDataTool
            }
         }
 
-        public event MsgEventHandle ShowMessaged;
+        public event MsgHandle ShowMessaged;
     }
 
     
@@ -27,6 +27,6 @@ namespace NationalSchoolsDataTool
 
     }
 
-    public delegate void MsgEventHandle(string e, string messLV, params object[] args);
+    public delegate void MsgHandle(string e, string messLV, params object[] args);
 
 }
