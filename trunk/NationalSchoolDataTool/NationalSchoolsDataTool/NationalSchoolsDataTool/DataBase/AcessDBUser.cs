@@ -77,7 +77,7 @@ namespace NationalSchoolsDataTool
 
                 for (int i = 0; i < cmdString.Count; i++)
                 {
-                    ProcessHelper.MsgEventHandle(string.Format(",共有数据: {0} 条,当前插入:第 {1} 条,插入数据:{2} ", cmdString.Count, i, cmdString[i]));
+                    MsgEventHandle(string.Format(TipInfos.CurrentRecord, cmdString.Count, i, cmdString[i]));
 
                     mycmd.CommandText = cmdString[i];
                     mycmd.ExecuteNonQuery();
@@ -88,7 +88,6 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("InsertProvinceObjToDB(Province obj) 错误 : {0} ", ex.InnerException));
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
@@ -146,8 +145,7 @@ namespace NationalSchoolsDataTool
             }
             catch (System.Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("QureyIDFromVillageDS(string villiageName, string districtID) 错误 : {0} ", ex.InnerException), MessageLV.High);
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+               System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
             }
         }
@@ -172,9 +170,7 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("FillVillageDSFromDB() 错误 : {0} ", ex.InnerException), MessageLV.High);
-
-                if (mycmd.Transaction != null)
+               if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 throw ex;
@@ -284,7 +280,6 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
@@ -322,8 +317,7 @@ namespace NationalSchoolsDataTool
             catch (System.Exception ex)
             {
                 System.Windows.Forms.MessageBox.Show(ex.Message);
-                ProcessHelper.MsgEventHandle(string.Format("QureyIDFromVillageDS(string villiageName, string districtID) 错误 : {0} ", ex.InnerException), MessageLV.High);
-                throw ex;
+               throw ex;
             }
         }
 
@@ -360,8 +354,7 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("InsertVillageInfoToDB(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+               System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
             }
@@ -401,7 +394,6 @@ namespace NationalSchoolsDataTool
             }
             catch (Exception ex)
             {
-                ProcessHelper.MsgEventHandle(string.Format("ReadMaxShcoolID(string villageID, string villageName, string cityIDByArea) 错误 : {0} ", ex.InnerException), MessageLV.High);
                 System.Windows.Forms.MessageBox.Show(ex.Message);
                 if (mycmd.Transaction != null)
                     mycmd.Transaction.Rollback();
